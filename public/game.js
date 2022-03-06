@@ -12,7 +12,6 @@ class Laser extends Phaser.Physics.Arcade.Sprite
 
 		this.setVelocityY(-900);
 	}
-
 }
 
 class LaserGroup extends Phaser.Physics.Arcade.Group
@@ -31,7 +30,6 @@ class LaserGroup extends Phaser.Physics.Arcade.Group
 
 	fireBullet(x, y) {
 		const laser = this.getFirstDead(false);
-
 		if(laser) {
 			laser.fire(x, y);
 		}
