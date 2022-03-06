@@ -51,8 +51,20 @@ class LaserGroup extends Phaser.Physics.Arcade.Group
 function removeAlien(alien,laser){
 	alien.disableBody(true,true);
 	laser.hit();
-}
-
+}/*
+class AlienGroup extends Phaser.Physics.Arcade.Group
+{
+	constructor(scene) {
+		super(scene.physics.world, scene);
+		this.createMultiple({
+			frameQuantity: 30,
+			key: 'laser',
+			active: false,
+			visible: true,
+			classType: Alien
+		});
+	}
+}*/
 class GameScene extends Phaser.Scene
 {
 	constructor() {
@@ -77,6 +89,8 @@ class GameScene extends Phaser.Scene
 			repeat: -1,
 		});
 		this.laserGroup = new LaserGroup(this);
+		//this.alienGroup = new AlienGroup(this);
+		
 		this.addAliens();
 		this.addShip();
 		this.addEvents();
