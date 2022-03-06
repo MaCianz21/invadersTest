@@ -64,11 +64,11 @@ class GameScene extends Phaser.Scene
 	addShip() {
 		const centerX = this.cameras.main.width / 2;
 		const bottom = this.cameras.main.height;
-		this.ship = this.add.image(centerX, bottom - 90, 'ship');
+		this.ship = this.physics.add.sprite(centerX, bottom - 90, 'ship');
+		this.ship.setCollideWorldBounds(true);
 	}
 
 	addEvents() {
-
 		// Moving the mouse should move the ship
 		this.input.on('pointermove', (pointer) => {
 			this.ship.x = pointer.x;
@@ -109,7 +109,8 @@ const config = {
 		default: 'arcade',
 		arcade: {
 			debug: false,
-			gravity: { y: 0 }
+			gravity: { y: 0 },
+			enableBody: true
 		}
 	},
   scale: {
