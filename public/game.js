@@ -3,7 +3,14 @@ class Laser extends Phaser.Physics.Arcade.Sprite
 	constructor(scene, x, y) {
 		super(scene, x, y, 'laser');
 	}
-
+	preUpdate(time, delta) {
+		super.preUpdate(time, delta);
+ 
+		if (this.y <= 0) {
+			this.setActive(false);
+			this.setVisible(false);
+		}
+	}
 	fire(x, y) {
 		this.body.reset(x, y);
 
@@ -12,13 +19,16 @@ class Laser extends Phaser.Physics.Arcade.Sprite
 
 		this.setVelocityY(-900);
 	}
+	hit(){
+		this.setActive(false);
+		this.setVisible(false);
+	}
 }
 
 class LaserGroup extends Phaser.Physics.Arcade.Group
 {
 	constructor(scene) {
 		super(scene.physics.world, scene);
-
 		this.createMultiple({
 			frameQuantity: 30,
 			key: 'laser',
@@ -34,14 +44,21 @@ class LaserGroup extends Phaser.Physics.Arcade.Group
 			laser.fire(x, y);
 		}
 	}
+	getLaser(){
+		return this.getFirstAlive(false);
+	}
+}
+function removeAlien(alien,laser){
+	alien.disableBody(true,true);
+	laser.hit();
 }
 
 class GameScene extends Phaser.Scene
 {
 	constructor() {
 		super("GameScene");
-
 		this.ship;
+		this.alien;
 		this.laserGroup;
 		this.inputKeys;
 	}
@@ -49,14 +66,26 @@ class GameScene extends Phaser.Scene
 	preload() {
 		this.load.image('laser', './assets/laserBlue.png');
 		this.load.image('ship', './assets/ship.png');
+		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
 	}
 
 	create() {
-
+		this.anims.create({
+			key: "animateAlien",
+			frames: this.anims.generateFrameNumbers("alien"),
+			frameRate: 2,
+			repeat: -1,
+		});
 		this.laserGroup = new LaserGroup(this);
-
+		this.addAliens();
 		this.addShip();
 		this.addEvents();
+		this.physics.add.collider(this.alien,this.laserGroup,removeAlien,null, this);
+	}
+	addAliens(){
+		const centerX = this.cameras.main.width / 2;
+		const bottom = 100;
+		this.alien = this.physics.add.sprite(centerX,bottom, 'alien').play("animateAlien");
 	}
 
 	addShip() {
@@ -96,6 +125,7 @@ class GameScene extends Phaser.Scene
 				this.fireBullet();
 			}
 		});
+
 	}
 }
 
