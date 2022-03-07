@@ -17,7 +17,6 @@ export class Laser extends Phaser.Physics.Arcade.Sprite
 		this.setActive(true);
 		this.setVisible(true);
 		this.setVelocityY(-900);
-        
 	}
 	hit(){
 		this.setVisible(false);
@@ -30,7 +29,7 @@ export class LaserGroup extends Phaser.Physics.Arcade.Group
 	constructor(scene) {
 		super(scene.physics.world, scene);
 		this.createMultiple({
-			frameQuantity: 30,
+			frameQuantity: 1,
 			key: 'laser',
 			active: false,
 			visible: false,
