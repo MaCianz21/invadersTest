@@ -40,12 +40,15 @@ class GameScene extends Phaser.Scene
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
 		const bottom = 100;
-
 		var children = this.alienGroup.getChildren();
+		var x = 18;
+		var y = 0;
 		for (var i = 0; i < children.length; i++){
-        	var x = Phaser.Math.Between(50, 750);
-        	var y = Phaser.Math.Between(50, 550);
-
+			if(i%10 == 0){
+				y = y + 50;
+				x = 18;
+			}
+			x = x + 68;
 			children[i].setPosition(x, y);
    		}
 		//this.physics.add.group(this.alienGroup);
