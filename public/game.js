@@ -1,70 +1,11 @@
-class Laser extends Phaser.Physics.Arcade.Sprite
-{
-	constructor(scene, x, y) {
-		super(scene, x, y, 'laser');
-	}
-	preUpdate(time, delta) {
-		super.preUpdate(time, delta);
- 
-		if (this.y <= 0) {
-			this.setActive(false);
-			this.setVisible(false);
-		}
-	}
-	fire(x, y) {
-		this.body.reset(x, y);
+import {Laser,LaserGroup} from './entity/laser.js';
+import {Alien,AlienGroup} from './entity/alien.js';
 
-		this.setActive(true);
-		this.setVisible(true);
-
-		this.setVelocityY(-900);
-	}
-	hit(){
-		this.setActive(false);
-		this.setVisible(false);
-	}
-}
-
-class LaserGroup extends Phaser.Physics.Arcade.Group
-{
-	constructor(scene) {
-		super(scene.physics.world, scene);
-		this.createMultiple({
-			frameQuantity: 30,
-			key: 'laser',
-			active: false,
-			visible: false,
-			classType: Laser
-		});
-	}
-
-	fireBullet(x, y) {
-		const laser = this.getFirstDead(false);
-		if(laser) {
-			laser.fire(x, y);
-		}
-	}
-	getLaser(){
-		return this.getFirstAlive(false);
-	}
-}
 function removeAlien(alien,laser){
 	alien.disableBody(true,true);
 	laser.hit();
-}/*
-class AlienGroup extends Phaser.Physics.Arcade.Group
-{
-	constructor(scene) {
-		super(scene.physics.world, scene);
-		this.createMultiple({
-			frameQuantity: 30,
-			key: 'laser',
-			active: false,
-			visible: true,
-			classType: Alien
-		});
-	}
-}*/
+}
+
 class GameScene extends Phaser.Scene
 {
 	constructor() {
@@ -89,17 +30,26 @@ class GameScene extends Phaser.Scene
 			repeat: -1,
 		});
 		this.laserGroup = new LaserGroup(this);
-		//this.alienGroup = new AlienGroup(this);
+		this.alienGroup = new AlienGroup(this);
 		
 		this.addAliens();
 		this.addShip();
 		this.addEvents();
-		this.physics.add.collider(this.alien,this.laserGroup,removeAlien,null, this);
+		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
 		const bottom = 100;
-		this.alien = this.physics.add.sprite(centerX,bottom, 'alien').play("animateAlien");
+
+		var children = this.alienGroup.getChildren();
+		for (var i = 0; i < children.length; i++){
+        	var x = Phaser.Math.Between(50, 750);
+        	var y = Phaser.Math.Between(50, 550);
+
+			children[i].setPosition(x, y);
+   		}
+		//this.physics.add.group(this.alienGroup);
+		//this.alien = this.physics.add.sprite(centerX,bottom, 'alien').play("animateAlien");
 	}
 
 	addShip() {
