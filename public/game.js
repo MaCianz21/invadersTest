@@ -14,17 +14,19 @@ class GameScene extends Phaser.Scene
 		this.alien;
 		this.laserGroup;
 		this.inputKeys;
+		this.bass;
 	}
 
 	preload() {
 		this.load.image('laser', './assets/laserBlue.png');
 		this.load.image('ship', './assets/ship.png');
 		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
-		this.load.audio('bass', [ './assets/audio/blaster.ogg', './assets/audio/blaster.mp3' ]);
+		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);
 	}
 
 	create() {
-		var bass = this.sound.add('bass');
+		this.bass = this.sound.add('bass');
+		
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -73,7 +75,7 @@ class GameScene extends Phaser.Scene
 		// Clicking the mouse should fire a bullet
 		this.input.on('pointerdown', (pointer) => {
 			this.fireBullet();
-			bass.play();
+			this.bass.play();
 		});
 
 		// Firing bullets should also work on enter / spacebar press
