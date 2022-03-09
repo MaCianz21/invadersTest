@@ -43,7 +43,4 @@ export class LaserGroup extends Phaser.Physics.Arcade.Group
 			laser.fire(x, y);
 		}
 	}
-	getLaser(){
-		return this.getFirstAlive(false);
-	}
 }
