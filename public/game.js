@@ -5,6 +5,10 @@ var score = 0;
 var scoreText;
 var ammo = 7;
 var ammoText;
+var life = 2;
+var lifeText;
+var timeText;
+var timedEvent;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -12,6 +16,12 @@ function removeAlien(alien,laser){
 	explosion.play();
 	score += 10;
 	scoreText.setText('Score: ' + score);
+}
+
+function reduceLife(ship,laser){
+	
+	life -= 1;
+	scoreText.setText('Life: ' + score+'/2');
 }
 
 class GameScene extends Phaser.Scene
@@ -39,9 +49,11 @@ class GameScene extends Phaser.Scene
 	create() {
 		
 		this.bass = this.sound.add('bass');
-		
+		timedEvent = this.time.delayedCall(100000);
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
-		ammoText = this.add.text(16, 40, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
+		ammoText = this.add.text(16, 46, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
+		lifeText = this.add.text(16, 76, 'Life : 2/2', { fontSize: '32px', fill: '#FFFF' });
+		timeText = this.add.text(16, 106);
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -55,6 +67,7 @@ class GameScene extends Phaser.Scene
 		this.addShip();
 		this.addEvents();
 		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
+		
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -126,7 +139,17 @@ class GameScene extends Phaser.Scene
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
-	update(time, delta) {/*
+	update(time, delta) {
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
+		{
+			lifeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
+		}
+		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
+		{
+			lifeText.setText('Time: ' + 1.00);
+			game.destroy(true);
+		}
+		/*
 		// Loop over all keys
 		this.inputKeys.forEach(key => {
 			// Check if the key was just pressed, and if so -> fire the bullet
