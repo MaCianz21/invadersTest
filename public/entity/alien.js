@@ -42,6 +42,7 @@ export class Alien extends Phaser.Physics.Arcade.Sprite
 		super(scene, x, y, 'alien');
         this.play("animateAlien");
 		this.alienLaser = new alienLaserGroup(scene);
+		this.sfx = this.sound.add('explosion');
 	}
 
 	fireBullet(x,y){

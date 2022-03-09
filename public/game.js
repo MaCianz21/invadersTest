@@ -6,7 +6,9 @@ var scoreText;
 var ammo = 7;
 var ammoText;
 function removeAlien(alien,laser){
+	alien.playExplosion();
 	alien.disableBody(true,true);
+	
 	laser.hit();
 	score += 10;
 	scoreText.setText('Score: ' + score);
@@ -21,6 +23,7 @@ class GameScene extends Phaser.Scene
 		this.laserGroup;
 		this.inputKeys;
 		this.bass;
+		this.explosion;
 	}
 
 	preload() {
@@ -28,11 +31,13 @@ class GameScene extends Phaser.Scene
 		this.load.image('ship', './assets/ship.png');
 		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
 		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);
+		this.load.audio('explosion', [ './audio/explosion.ogg', './audio/explosion.mp3' ]);
 	}
 
 	create() {
 		
 		this.bass = this.sound.add('bass');
+		this.alienExplosion =  this.sound.add('explosion');
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 40, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
 		this.anims.create({
@@ -73,6 +78,15 @@ class GameScene extends Phaser.Scene
 		this.ship.setCollideWorldBounds(true);
 	}
 
+	reloadAmmo(event)
+	{
+		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
+			ammo=7;
+			ammoText.setText('Ammo : ' + ammo);
+		}
+			
+		
+	}
 	addEvents() {
 		this.input.on('pointermove', (pointer) => {
 			this.ship.x = pointer.x;
@@ -91,8 +105,11 @@ class GameScene extends Phaser.Scene
 			{
 				ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
 			}
+
 			
 		});
+
+		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
 		// Firing bullets should also work on enter / spacebar press
 		/*this.inputKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
