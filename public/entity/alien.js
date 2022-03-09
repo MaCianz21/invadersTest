@@ -28,19 +28,12 @@ export class alienLaserGroup extends Phaser.Physics.Arcade.Group
 	constructor(scene) {
 		super(scene.physics.world, scene);
 		this.createMultiple({
-			frameQuantity: 1,
+			frameQuantity: 5,
 			key: 'laser',
 			active: false,
 			visible: false,
 			classType: alienLaser
 		});
-	}
-
-	fireBullet(x, y) {
-		const laser = this.getFirstDead(false);
-		if(laser) {
-			laser.fire(x, y);
-		}
 	}
 }
 export class Alien extends Phaser.Physics.Arcade.Sprite
@@ -48,7 +41,6 @@ export class Alien extends Phaser.Physics.Arcade.Sprite
 	constructor(scene, x, y) {
 		super(scene, x, y, 'alien');
         this.play("animateAlien");
-		this.alienLaser = new alienLaserGroup();
 	}
 }
 export class AlienGroup extends Phaser.Physics.Arcade.Group
@@ -62,5 +54,13 @@ export class AlienGroup extends Phaser.Physics.Arcade.Group
 			visible: true,
 			classType: Alien,
 		});
+		this.alienLaser = new alienLaserGroup(scene);
+	}
+	
+	fireBullet(x,y){
+		const laser = this.alienLaser.getFirstDead(false);
+		if(laser) {
+			laser.fire(x, y);
+		}
 	}
 }

@@ -78,24 +78,24 @@ class GameScene extends Phaser.Scene
 		});
 
 		// Firing bullets should also work on enter / spacebar press
-		/*this.inputKeys = [
+		this.inputKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
-		];*/
+		];
 	}
 
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 
-	update() {/*
+	update() {
 		// Loop over all keys
 		this.inputKeys.forEach(key => {
 			// Check if the key was just pressed, and if so -> fire the bullet
 			if(Phaser.Input.Keyboard.JustDown(key)) {
-				this.fireBullet();
+				this.alienGroup.fireBullet(this.alienGroup.getFirstAlive().x, this.alienGroup.getFirstAlive().y);
 			}
-		});*/
+		});
 
 	}
 }
