@@ -6,10 +6,10 @@ var scoreText;
 var ammo = 7;
 var ammoText;
 function removeAlien(alien,laser){
-	alien.playExplosion();
+	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
-	
 	laser.hit();
+	explosion.play();
 	score += 10;
 	scoreText.setText('Score: ' + score);
 }
@@ -23,7 +23,7 @@ class GameScene extends Phaser.Scene
 		this.laserGroup;
 		this.inputKeys;
 		this.bass;
-		this.explosion;
+		
 	}
 
 	preload() {
@@ -32,12 +32,14 @@ class GameScene extends Phaser.Scene
 		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
 		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);
 		this.load.audio('explosion', [ './audio/explosion.ogg', './audio/explosion.mp3' ]);
+		this.load.audio('ammo', [ './audio/ammo.ogg', './audio/ammo.mp3' ]);
+		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
 	}
 
 	create() {
 		
 		this.bass = this.sound.add('bass');
-		this.alienExplosion =  this.sound.add('explosion');
+		
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 40, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
 		this.anims.create({
@@ -81,6 +83,8 @@ class GameScene extends Phaser.Scene
 	reloadAmmo(event)
 	{
 		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
+			var ammoEffect = this.sound.add('ammo');	
+			ammoEffect.play();
 			ammo=7;
 			ammoText.setText('Ammo : ' + ammo);
 		}
@@ -104,6 +108,8 @@ class GameScene extends Phaser.Scene
 			if(ammo==0)
 			{
 				ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+				var outAmmoEffect = this.sound.add('outAmmo');	
+			    outAmmoEffect.play();
 			}
 
 			
