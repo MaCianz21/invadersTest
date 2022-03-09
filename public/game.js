@@ -56,8 +56,6 @@ class GameScene extends Phaser.Scene
 			x = x + 68;
 			children[i].setPosition(x, y);
    		}
-		//this.physics.add.group(this.alienGroup);
-		//this.alien = this.physics.add.sprite(centerX,bottom, 'alien').play("animateAlien");
 	}
 
 	addShip() {
@@ -77,26 +75,29 @@ class GameScene extends Phaser.Scene
 			this.bass.play();
 		});
 
+		setInterval(this.alienShoot, 500);
 		// Firing bullets should also work on enter / spacebar press
-		this.inputKeys = [
+		/*this.inputKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
-		];
+		];*/
 	}
 
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
-
-	update() {
+	alienShoot(){
+		var alienShoot = this.alienGroup.getChildren()[Phaser.Math.Between(0, 49)];
+		alienShoot.fireBullet(alienShoot.x,alienShoot.y);
+	}
+	update(time, delta) {/*
 		// Loop over all keys
 		this.inputKeys.forEach(key => {
 			// Check if the key was just pressed, and if so -> fire the bullet
 			if(Phaser.Input.Keyboard.JustDown(key)) {
 				this.alienGroup.fireBullet(this.alienGroup.getFirstAlive().x, this.alienGroup.getFirstAlive().y);
 			}
-		});
-
+		});*/
 	}
 }
 
