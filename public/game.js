@@ -1,9 +1,15 @@
 import {Laser,LaserGroup} from './entity/laser.js';
 import {Alien,AlienGroup} from './entity/alien.js';
 
+var score = 0;
+var scoreText;
+var ammo = 7;
+var ammoText;
 function removeAlien(alien,laser){
 	alien.disableBody(true,true);
 	laser.hit();
+	score += 10;
+	scoreText.setText('Score: ' + score);
 }
 
 class GameScene extends Phaser.Scene
@@ -11,7 +17,7 @@ class GameScene extends Phaser.Scene
 	constructor() {
 		super("GameScene");
 		this.ship;
-		this.alien;
+		this.alienGroup;
 		this.laserGroup;
 		this.inputKeys;
 		this.bass;
@@ -25,8 +31,10 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
-		this.bass = this.sound.add('bass');
 		
+		this.bass = this.sound.add('bass');
+		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
+		ammoText = this.add.text(16, 40, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -47,7 +55,7 @@ class GameScene extends Phaser.Scene
 
 		var children = this.alienGroup.getChildren();
 		var x = 18;
-		var y = 0;
+		var y = 100;
 		for (var i = 0; i < children.length; i++){
 			if(i%10 == 0){
 				y = y + 50;
@@ -71,11 +79,20 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.on('pointerdown', (pointer) => {
-			this.fireBullet();
-			this.bass.play();
+			
+			if(ammo>0)
+			{
+				ammo-=1;
+			    ammoText.setText('Ammo : ' + ammo);
+				this.fireBullet();
+			    this.bass.play();
+			}
+			if(ammo==0)
+			{
+				ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+			}
+			
 		});
-
-		setInterval(this.alienShoot, 500);
 		// Firing bullets should also work on enter / spacebar press
 		/*this.inputKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
@@ -86,10 +103,6 @@ class GameScene extends Phaser.Scene
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
-	alienShoot(){
-		var alienShoot = this.alienGroup.getChildren()[Phaser.Math.Between(0, 49)];
-		alienShoot.fireBullet(alienShoot.x,alienShoot.y);
-	}
 	update(time, delta) {/*
 		// Loop over all keys
 		this.inputKeys.forEach(key => {
@@ -98,6 +111,12 @@ class GameScene extends Phaser.Scene
 				this.alienGroup.fireBullet(this.alienGroup.getFirstAlive().x, this.alienGroup.getFirstAlive().y);
 			}
 		});*/
+		if(Math.round(time/100)%20 == 0){
+			var random = Phaser.Math.Between(0, 49);
+			console.log(random);
+			var alienShoot = this.alienGroup.getChildren()[random];
+			alienShoot.fireBullet(alienShoot.x,alienShoot.y);
+		}
 	}
 }
 
@@ -117,7 +136,7 @@ const config = {
     parent: 'container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 800,
-    height: 600
+    height: 700
   } ,
 	scene: [GameScene]
 };
