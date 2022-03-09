@@ -72,7 +72,6 @@ class GameScene extends Phaser.Scene
 			this.ship.x = pointer.x;
 		});
 
-		// Clicking the mouse should fire a bullet
 		this.input.on('pointerdown', (pointer) => {
 			this.fireBullet();
 			this.bass.play();
