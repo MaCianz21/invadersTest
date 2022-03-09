@@ -67,7 +67,6 @@ class GameScene extends Phaser.Scene
 	}
 
 	addEvents() {
-		// Moving the mouse should move the ship
 		this.input.on('pointermove', (pointer) => {
 			this.ship.x = pointer.x;
 		});
