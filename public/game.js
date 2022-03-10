@@ -3,7 +3,7 @@ import {Alien,AlienGroup} from './entity/alien.js';
 
 var score = 0;
 var scoreText;
-var ammo = 7;
+var ammo = 3;
 var ammoText;
 var life = 2;
 var lifeText;
@@ -56,7 +56,7 @@ class GameScene extends Phaser.Scene
 		startGame.play();	
 		timedEvent = this.time.delayedCall(100000);
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
-		ammoText = this.add.text(16, 46, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
+		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '32px', fill: '#FFFF' });
 		lifeText = this.add.text(16, 76, 'Life : 2/2', { fontSize: '32px', fill: '#FFFF' });
 		timeText = this.add.text(16, 106);
 		this.anims.create({
@@ -103,7 +103,7 @@ class GameScene extends Phaser.Scene
 		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
 			var ammoEffect = this.sound.add('ammo');	
 			ammoEffect.play();
-			ammo=7;
+			ammo=3;
 			ammoText.setText('Ammo : ' + ammo);
 		}
 			
