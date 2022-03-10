@@ -9,6 +9,7 @@ var life = 2;
 var lifeText;
 var timeText;
 var timedEvent;
+var lastLaserTime = 0;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -51,6 +52,8 @@ class GameScene extends Phaser.Scene
 		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
 		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
 		this.load.audio('startGame', [ './audio/game.ogg', './audio/game.mp3' ]);
+		this.load.audio('shootDelay', [ './audio/Click1.wav' ]);
+		
 	}
 
 	create() {
@@ -122,21 +125,29 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.on('pointerdown', (pointer) => {
+			var time = timedEvent.getProgress().toString().substr(0, 5);
+			console.log(time - lastLaserTime );
 			
 			if(ammo>0)
 			{
-				ammo-=1;
-			    ammoText.setText('Ammo : ' + ammo);
-				this.fireBullet();
-			    this.bass.play();
+				if (time - lastLaserTime >0.005){
+					lastLaserTime = time;
+					ammo-=1;
+					ammoText.setText('Ammo : ' + ammo);
+					this.fireBullet();
+					this.bass.play();
+				}
+				else{
+					var shootDelay = this.sound.add('shootDelay');	
+					shootDelay.play();
+				}
 			}
 			if(ammo==0)
 			{
 				ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
 				var outAmmoEffect = this.sound.add('outAmmo');	
-			    outAmmoEffect.play();
+				outAmmoEffect.play();
 			}
-
 			
 		});
 
@@ -145,7 +156,7 @@ class GameScene extends Phaser.Scene
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
-	update(time, delta) {
+	update(time) {
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
