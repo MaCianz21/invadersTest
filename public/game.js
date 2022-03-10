@@ -5,11 +5,11 @@ var score = 0;
 var scoreText;
 var ammo = 3;
 var ammoText;
-var life = 2;
-var lifeText;
 var timeText;
 var timedEvent;
 var lastLaserTime = 0;
+var startGame;
+var gameOverText;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -25,8 +25,17 @@ function shipHit(ship,laser){
 	laser.destroy();
 	explosion.play();
 
-	life = life - 1;
-	lifeText.setText('Life : ' + life+'/2');
+	if(score>5)
+	{
+		score -= 5;
+	    scoreText.setText('Score: ' + score);
+	}
+	else
+	{
+		score=0;
+		scoreText.setText('Score: ' + score);
+	}
+	
 }
 
 
@@ -58,13 +67,14 @@ class GameScene extends Phaser.Scene
 
 	create() {
 		this.bass = this.sound.add('bass');
-		var startGame = this.sound.add('startGame');
+	    startGame = this.sound.add('startGame');
 		startGame.play();	
 		timedEvent = this.time.delayedCall(100000);
+		//timedEvent = this.time.delayedCall(3000);
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
-		lifeText = this.add.text(16, 76, 'Life : 2/2', { fontSize: '30px', fill: '#FFFF' });
-		timeText = this.add.text(16, 106);
+		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
+		
 
 
 		this.anims.create({
@@ -163,12 +173,13 @@ class GameScene extends Phaser.Scene
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
 		{
-			timeText.setText('Time: ' + 1.00);
-			const user = {
-				"id": 1,
-				"score": score
-			};
-			game.destroy(true);
+			if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
+		    {
+				startGame.stop();
+				this.scene.start('GameOver');
+		    }
+			
+			
 		}
 		if(Math.round(time/100)%10 == 0){
 			var random = Phaser.Math.Between(0, 49);
@@ -177,7 +188,30 @@ class GameScene extends Phaser.Scene
 		}
 	}
 }
+class GameOver extends Phaser.Scene {
 
+    constructor ()
+    {
+        super('GameOver');
+    }
+ 
+	preload() {
+		
+		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
+		
+
+	}
+    create ()
+    {
+        var gameOver = this.sound.add('gameOver');	
+		
+		scoreText = this.add.text(16, 16, 'Score: '+score, { fontSize: '32px', fill: '#FFFF' });
+		gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
+        gameOver.play();
+
+        
+    }
+}
 const config = {
 	type: Phaser.AUTO,
 	width: 800,
@@ -196,7 +230,7 @@ const config = {
     width: 800,
     height: 700
   } ,
-	scene: [GameScene]
+	scene: [GameScene,GameOver]
 };
 
 const game = new Phaser.Game(config);
