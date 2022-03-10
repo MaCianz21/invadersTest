@@ -24,6 +24,7 @@ function reduceLife(ship,laser){
 	scoreText.setText('Life: ' + score+'/2');
 }
 
+
 class GameScene extends Phaser.Scene
 {
 	constructor() {
@@ -44,11 +45,15 @@ class GameScene extends Phaser.Scene
 		this.load.audio('explosion', [ './audio/explosion.ogg', './audio/explosion.mp3' ]);
 		this.load.audio('ammo', [ './audio/ammo.ogg', './audio/ammo.mp3' ]);
 		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
+		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
+		this.load.audio('startGame', [ './audio/game.ogg', './audio/game.mp3' ]);
 	}
 
 	create() {
 		
 		this.bass = this.sound.add('bass');
+		var startGame = this.sound.add('startGame');
+		startGame.play();	
 		timedEvent = this.time.delayedCall(100000);
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 7', { fontSize: '32px', fill: '#FFFF' });
@@ -147,6 +152,11 @@ class GameScene extends Phaser.Scene
 		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
 		{
 			lifeText.setText('Time: ' + 1.00);
+			const user = {
+				"id": 1,
+				"score": score
+			};
+			
 			game.destroy(true);
 		}
 		/*
