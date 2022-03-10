@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene
 				this.alienGroup.fireBullet(this.alienGroup.getFirstAlive().x, this.alienGroup.getFirstAlive().y);
 			}
 		});*/
-		if(Math.round(time/100)%20 == 0){
+		if(Math.round(time/100)%10 == 0){
 			var random = Phaser.Math.Between(0, 49);
 			console.log(random);
 			var alienShoot = this.alienGroup.getChildren()[random];
