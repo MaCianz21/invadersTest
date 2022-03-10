@@ -1,5 +1,5 @@
 import {Laser,LaserGroup} from './entity/laser.js';
-import {Alien,AlienGroup} from './entity/alien.js';
+import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
 
 var score = 0;
 var scoreText;
@@ -18,10 +18,14 @@ function removeAlien(alien,laser){
 	scoreText.setText('Score: ' + score);
 }
 
-function reduceLife(ship,laser){
+function shipHit(ship,laser){
+	var explosion = this.sound.add('explosion');
 	
-	life -= 1;
-	scoreText.setText('Life: ' + score+'/2');
+	laser.destroy();
+	explosion.play();
+
+	life = life - 1;
+	lifeText.setText('Life : ' + life+'/2');
 }
 
 
@@ -50,15 +54,16 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
-		
 		this.bass = this.sound.add('bass');
 		var startGame = this.sound.add('startGame');
 		startGame.play();	
 		timedEvent = this.time.delayedCall(100000);
-		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFF' });
-		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '32px', fill: '#FFFF' });
-		lifeText = this.add.text(16, 76, 'Life : 2/2', { fontSize: '32px', fill: '#FFFF' });
+		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
+		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
+		lifeText = this.add.text(16, 76, 'Life : 2/2', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 106);
+
+
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -67,11 +72,13 @@ class GameScene extends Phaser.Scene
 		});
 		this.laserGroup = new LaserGroup(this);
 		this.alienGroup = new AlienGroup(this);
-		
+		this.alienLaser = new AlienLaserGroup(this);
+
 		this.addAliens();
 		this.addShip();
 		this.addEvents();
 		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
+		this.physics.add.overlap(this.ship,this.alienLaser,shipHit,null, this);
 		
 	}
 	addAliens(){
@@ -134,44 +141,28 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
-		// Firing bullets should also work on enter / spacebar press
-		/*this.inputKeys = [
-			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
-			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
-		];*/
 	}
-
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time, delta) {
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
-			lifeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
+			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
 		{
-			lifeText.setText('Time: ' + 1.00);
+			timeText.setText('Time: ' + 1.00);
 			const user = {
 				"id": 1,
 				"score": score
 			};
-			
 			game.destroy(true);
 		}
-		/*
-		// Loop over all keys
-		this.inputKeys.forEach(key => {
-			// Check if the key was just pressed, and if so -> fire the bullet
-			if(Phaser.Input.Keyboard.JustDown(key)) {
-				this.alienGroup.fireBullet(this.alienGroup.getFirstAlive().x, this.alienGroup.getFirstAlive().y);
-			}
-		});*/
 		if(Math.round(time/100)%10 == 0){
 			var random = Phaser.Math.Between(0, 49);
-			console.log(random);
 			var alienShoot = this.alienGroup.getChildren()[random];
-			alienShoot.fireBullet(alienShoot.x,alienShoot.y);
+			this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
 		}
 	}
 }
