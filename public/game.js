@@ -11,6 +11,9 @@ var lastLaserTime = 0;
 var startGame;
 var gameOverText;
 var modalityText;
+var socket;
+var msg;
+var classification;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -69,6 +72,8 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
+		socket = io();
+		
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();	
@@ -78,6 +83,7 @@ class GameScene extends Phaser.Scene
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modalityText = this.add.text(250, 16, 'Modality: Easy', { fontSize: '30px', fill: '#FFFF' });
+		classification = this.add.text(800, 16, 'Classification:\n1.       0', { fontSize: '30px', fill: '#FFFF' });
 		
 
 
@@ -135,7 +141,11 @@ class GameScene extends Phaser.Scene
 	}
 	addEvents() {
 		this.input.on('pointermove', (pointer) => {
-			this.ship.x = pointer.x;
+			if(pointer.x<=750)
+			{
+				this.ship.x = pointer.x;
+			}
+			
 		});
 
 		this.input.on('pointerdown', (pointer) => {
@@ -171,6 +181,16 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
+		
+		socket.emit('score',score);
+		
+		socket.on("message", function(data){
+			classification.setText('Classification:\n1.       '+data);
+		 }); 
+			  
+		
+		
+		
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
@@ -234,7 +254,7 @@ class GameOver extends Phaser.Scene {
 		scoreText = this.add.text(16, 16, 'Score: '+score, { fontSize: '32px', fill: '#FFFF' });
 		gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
         gameOver.play();
-
+		
         
     }
 }
@@ -253,7 +273,7 @@ const config = {
   scale: {
     parent: 'container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 800,
+    width: 1200,
     height: 700
   } ,
 	scene: [GameScene,GameOver]
