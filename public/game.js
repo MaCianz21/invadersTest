@@ -10,6 +10,7 @@ var timedEvent;
 var lastLaserTime = 0;
 var startGame;
 var gameOverText;
+var modalityText;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -20,10 +21,10 @@ function removeAlien(alien,laser){
 }
 
 function shipHit(ship,laser){
-	var explosion = this.sound.add('explosion');
+	var kill = this.sound.add('kill');
 	
 	laser.destroy();
-	explosion.play();
+	kill.play();
 
 	if(score>5)
 	{
@@ -61,6 +62,7 @@ class GameScene extends Phaser.Scene
 		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
 		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
 		this.load.audio('startGame', [ './audio/game.ogg', './audio/game.mp3' ]);
+		this.load.audio('kill', [ './audio/kill.ogg', './audio/kill.mp3' ]);
 		this.load.audio('shootDelay', [ './audio/Click1.wav' ]);
 		
 	}
@@ -74,6 +76,7 @@ class GameScene extends Phaser.Scene
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
+		modalityText = this.add.text(250, 16, 'Modality: Easy', { fontSize: '30px', fill: '#FFFF' });
 		
 
 
@@ -181,11 +184,33 @@ class GameScene extends Phaser.Scene
 			
 			
 		}
-		if(Math.round(time/100)%10 == 0){
-			var random = Phaser.Math.Between(0, 49);
-			var alienShoot = this.alienGroup.getChildren()[random];
-			this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.20)
+		{
+			if(Math.round(time/100)%15 == 0){
+				var random = Phaser.Math.Between(0, 49);
+				var alienShoot = this.alienGroup.getChildren()[random];
+				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+			}
 		}
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40)
+		{
+			if(Math.round(time/100)%10 == 0){
+				modalityText.setText('Modality: Indermediate');
+				var random = Phaser.Math.Between(0, 49);
+				var alienShoot = this.alienGroup.getChildren()[random];
+				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+			}
+		}
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60)
+		{
+			if(Math.round(time/100)%5 == 0){
+				modalityText.setText('Modality: Hard');
+				var random = Phaser.Math.Between(0, 49);
+				var alienShoot = this.alienGroup.getChildren()[random];
+				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+			}
+		}
+		
 	}
 }
 class GameOver extends Phaser.Scene {
