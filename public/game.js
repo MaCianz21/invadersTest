@@ -54,6 +54,7 @@ class GameScene extends Phaser.Scene
 
 	preload() {
 		this.load.image('laser', './assets/laserBlue.png');
+		this.load.image('laserAlien', './assets/laserRed.png');
 		this.load.image('ship', './assets/ship.png');
 		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
 		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);

@@ -1,7 +1,7 @@
 class alienLaser extends Phaser.Physics.Arcade.Sprite
 {
 	constructor(scene, x, y) {
-		super(scene, x, y, 'laser');
+		super(scene, x, y, 'laserAlien');
 	}
 	preUpdate(time, delta) {
 		super.preUpdate(time, delta);
