@@ -12,8 +12,10 @@ var startGame;
 var gameOverText;
 var modalityText;
 var socket;
-var msg;
 var classification;
+var pointText;
+var point = [];
+var button;
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -22,6 +24,7 @@ function removeAlien(alien,laser){
 	score += 10;
 	scoreText.setText('Score: ' + score);
 }
+
 
 function shipHit(ship,laser){
 	var kill = this.sound.add('kill');
@@ -74,6 +77,7 @@ class GameScene extends Phaser.Scene
 	create() {
 		socket = io();
 		
+		
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();	
@@ -83,7 +87,8 @@ class GameScene extends Phaser.Scene
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modalityText = this.add.text(250, 16, 'Modality: Easy', { fontSize: '30px', fill: '#FFFF' });
-		classification = this.add.text(800, 16, 'Classification:\n1.       0', { fontSize: '30px', fill: '#FFFF' });
+		classification = this.add.text(800, 16, 'Classification', { fontSize: '30px', fill: '#FFFF' });
+		pointText = this.add.text(800,60, '1.', { fontSize: '20px', fill: '#FFFF' });
 		
 
 
@@ -102,6 +107,7 @@ class GameScene extends Phaser.Scene
 		this.addEvents();
 		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
 		this.physics.add.overlap(this.ship,this.alienLaser,shipHit,null, this);
+		
 		
 	}
 	addAliens(){
@@ -181,16 +187,12 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-		
-		socket.emit('score',score);
-		
+		socket.emit(socket.id,score);
 		socket.on("message", function(data){
-			classification.setText('Classification:\n1.       '+data);
+				point = JSON.stringify(data);
+				var jsonPretty = JSON.stringify(JSON.parse(point),null,2); 
+				pointText.setText('1.       '+jsonPretty);
 		 }); 
-			  
-		
-		
-		
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
@@ -254,7 +256,10 @@ class GameOver extends Phaser.Scene {
 		scoreText = this.add.text(16, 16, 'Score: '+score, { fontSize: '32px', fill: '#FFFF' });
 		gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
         gameOver.play();
-		
+		const helloButton = this.add.text(600, 600, 'Return homePage', { fill: '#FF0000' });
+    	helloButton.setInteractive();
+
+    	helloButton.on('pointerdown', () => { this.scene.start('GameScene'); });
         
     }
 }

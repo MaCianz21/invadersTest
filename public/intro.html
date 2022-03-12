@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Space Invaders</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Multiplayer space invaders" />
+    
+    
+    
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="intro-body" style="position:relative; left: 30%;">
+     
+    <img
+      alt="Space invaders"
+      width="580"
+      height="250"
+      src="https://upload.wikimedia.org/wikipedia/commons/1/18/Space_invaders_logo.svg"
+    />
+    <div class="game-instructions">
+      <p>
+        Use the arrow keys on your keyboard to move your avatar left or right to
+        escape the bullets from the spaceship.<br />
+        Your goal is to make it to the other side, alive!
+      </p>
+    </div>
+    <div class="input-group nickname-input"   style="position:relative; left: 10%;width:15%">
+      <input
+	
+        type="text"
+        class="form-control"
+        placeholder="Enter your nickname"
+        aria-label="Enter your nickname"
+        aria-describedby="basic-addon2"
+      
+        id="nickname"
+      />
+      <div class="input-group-append">
+        <a href="gameplay">
+          <span class="input-group-text" "id="go-span" onclick="setNickname()"
+            >GO
+          </span>
+        </a>
+      </div>
+    </div>
+    <div style="position:relative; right:10%;">
+    <img 
+      alt="Invader avatars"
+      width="60%"
+      height="300"
+      
+      src="https://1b-f.s3.eu-west-1.amazonaws.com/a/87730-15393443-BF39-4D81-9E99-D06880FF7442-0-1503914555.gif"
+    />
+    </div>
+   
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+    </script>
+  </body>
+</html>

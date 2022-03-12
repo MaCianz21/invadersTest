@@ -4,25 +4,35 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-var mex;
+var numPlayer=0;
 app.use(express.static(__dirname + '/public'));
-
+var point={};
+var id;
+io.on('connection', (socket) => {
+  
+  numPlayer++;
+  
+  console.log('user '+socket.id+' connected');
+  
+  console.log('Number Player: '+numPlayer);
+  
+});
 app.get('/', function (req, res) {
-
-  res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 io.on('connection', (socket) => {
-  console.log('user'+socket.id+'connected');
-});
-io.on('connection', (socket) => {
-  console.log('a user connected');
+  //console.log('a user connected');
   socket.on('disconnect', () => {
     console.log('user '+socket.id+' disconnected');
   });
 });
 io.on('connection', (socket) => {
-  socket.on('score', (msg) => {
-    io.emit('message',msg);
+  socket.on(socket.id, (msg) => {
+    point[socket.id]=msg;
+    console.log(point);
+    io.emit('message',point);
+    
+    
     
   });
 });
@@ -32,7 +42,4 @@ console.log('Server listening on http://localhost:8080');
 
 io.sockets.on('connection', function(socket){
   console.log('socket connection');
-  socket.on('update item',function(data){
-    console.log('update item' + data.point);
-  });
 });
