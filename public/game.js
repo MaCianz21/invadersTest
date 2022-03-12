@@ -10,7 +10,7 @@ var timedEvent;
 var lastLaserTime = 0;
 var startGame;
 var gameOverText;
-var modalityText;
+var modeText;
 var socket;
 var classification;
 var pointText;
@@ -76,22 +76,19 @@ class GameScene extends Phaser.Scene
 
 	create() {
 		socket = io();
-		
-		
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
-		startGame.play();	
+		startGame.play();
+
 		timedEvent = this.time.delayedCall(100000);
-		//timedEvent = this.time.delayedCall(3000);
+
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
-		modalityText = this.add.text(250, 16, 'Modality: Easy', { fontSize: '30px', fill: '#FFFF' });
-		classification = this.add.text(800, 16, 'Classification', { fontSize: '30px', fill: '#FFFF' });
+		modeText = this.add.text(250, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
+		classification = this.add.text(800, 16, 'Leaderboard', { fontSize: '30px', fill: '#FFFF' });
 		pointText = this.add.text(800,60, '1.', { fontSize: '20px', fill: '#FFFF' });
 		
-
-
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -107,8 +104,6 @@ class GameScene extends Phaser.Scene
 		this.addEvents();
 		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
 		this.physics.add.overlap(this.ship,this.alienLaser,shipHit,null, this);
-		
-		
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -142,8 +137,6 @@ class GameScene extends Phaser.Scene
 			ammo=3;
 			ammoText.setText('Ammo : ' + ammo);
 		}
-			
-		
 	}
 	addEvents() {
 		this.input.on('pointermove', (pointer) => {
@@ -156,7 +149,6 @@ class GameScene extends Phaser.Scene
 
 		this.input.on('pointerdown', (pointer) => {
 			var time = timedEvent.getProgress().toString().substr(0, 5);
-			console.log(time - lastLaserTime );
 			
 			if(ammo>0)
 			{
@@ -182,17 +174,41 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
+
+		
+		socket.on("message", function(data){
+			var i = 1;
+			var Leaderboard = "";
+/*
+			var ordered = Object.keys(data).sort().reduce(
+				(obj, key) => { 
+				  obj[key] = data[key]; 
+				  return obj;
+				}, 
+				{}
+			);*/
+			var ordered = {};
+			Object.entries(data)
+			.sort((a, b) => a[1] - b[1])
+			.forEach(([key, val]) => {
+				ordered[key] = val;
+			});
+			for(var key in ordered) {
+				if(ordered.hasOwnProperty(key)) {
+					var propValue = ordered[key];
+					Leaderboard = Leaderboard+i+'.'+key+'\t'+propValue+"\n";
+					i++;
+				}
+			};
+			pointText.setText(Leaderboard);
+		});
 	}
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
 		socket.emit(socket.id,score);
-		socket.on("message", function(data){
-				point = JSON.stringify(data);
-				var jsonPretty = JSON.stringify(JSON.parse(point),null,2); 
-				pointText.setText('1.       '+jsonPretty);
-		 }); 
+
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
@@ -204,8 +220,6 @@ class GameScene extends Phaser.Scene
 				startGame.stop();
 				this.scene.start('GameOver');
 		    }
-			
-			
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20)
 		{
@@ -215,10 +229,11 @@ class GameScene extends Phaser.Scene
 				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
 			}
 		}
+
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40)
 		{
 			if(Math.round(time/100)%10 == 0){
-				modalityText.setText('Modality: Indermediate');
+				modeText.setText('Mode: Indermediate');
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
 				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
@@ -227,7 +242,7 @@ class GameScene extends Phaser.Scene
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60)
 		{
 			if(Math.round(time/100)%5 == 0){
-				modalityText.setText('Modality: Hard');
+				modeText.setText('Mode: Hard');
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
 				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
@@ -244,10 +259,7 @@ class GameOver extends Phaser.Scene {
     }
  
 	preload() {
-		
 		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
-		
-
 	}
     create ()
     {
