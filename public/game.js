@@ -26,6 +26,10 @@ var formJoinRoom;
 var activeDescription;
 var lobby;
 var start=false;
+function Game()
+{
+	scene.start('GameScene');
+}
 function removeAlien(alien,laser){
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
@@ -93,6 +97,7 @@ class GameScene extends Phaser.Scene
 		startGame.play();
 
 		timedEvent = this.time.delayedCall(100000);
+		
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -325,16 +330,20 @@ class HomeScene extends Phaser.Scene {
 		image4.visible=true;
 		image5.visible=false;
 		
+		
         createRoom.on('click', function (event) {
-
+			
+			
 			if (event.target.name === 'createRoom')
 			{
 				var roomName = this.getChildByName('roomName');
 				var nickname = this.getChildByName('nickname');
 				var players = this.getChildByName('players');
-				if(roomName.value != '' && roomValue!=0)
+			
+				if(roomName.value != '' && nickname.value!=0)
 				{
-					this.scene.start('GameScene');
+					start=true;
+					
 				}
 			}
 			
@@ -402,7 +411,7 @@ class HomeScene extends Phaser.Scene {
     }
 	update()
 	{
-		if(start === true)
+		if(start===true)
 		{
 			this.scene.start('GameScene');
 		}
@@ -453,7 +462,7 @@ const config = {
     width: 1200,
     height: 700
   } ,
-	scene: [GameScene,GameOver]
+	scene: [HomeScene,GameScene,GameOver]
 };
 
 const game = new Phaser.Game(config);
