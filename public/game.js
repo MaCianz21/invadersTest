@@ -208,13 +208,26 @@ class GameScene extends Phaser.Scene
 			.forEach(([key, val]) => {
 				ordered[key] = val;
 			});
+			var tuples = [];
 			for(var key in ordered) {
+				
 				if(ordered.hasOwnProperty(key)) {
-					var propValue = ordered[key];
-					Leaderboard = Leaderboard+i+'.'+key+'\t'+propValue+"\n";
-					i++;
+					tuples.push([key, ordered[key]]);
+					tuples.sort(function(a, b) {
+						a = a[1];
+						b = b[1];
+					
+						return a > b ? -1 : (a < b ? 1 : 0);
+					});
+					
+		
 				}
 			};
+			for (var i = 0; i < tuples.length; i++) {
+				var key = tuples[i][0];
+				var value = tuples[i][1];
+				Leaderboard = Leaderboard+(i+1)+'.  '+key+'\t'+value+"\n";
+			}
 			pointText.setText(Leaderboard);
 		});
 	}
@@ -385,12 +398,7 @@ class HomeScene extends Phaser.Scene {
 			}
 	
 		});
-		this.tweens.add({
-			targets: element,
-			y: 300,
-			duration: 3000,
-			ease: 'Power3'
-		});
+		
     }
 	update()
 	{
