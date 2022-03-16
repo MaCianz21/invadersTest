@@ -12,6 +12,7 @@ var gameOverText;
 var modeText;
 var socket;
 var classification;
+var start= false;
 var pointText;
 var loadText;
 var point = [];
@@ -465,18 +466,29 @@ class LoadScene extends Phaser.Scene {
 		loadText = this.add.text(16, 16, 'Wait other players', { fontSize: '60px', fill: '#FFFF' });
 		
 	}
+	
     create ()
     {	
     }
 	update()
 	{
+		socket.emit('num', {
+			name: roomName.value,
+		  });
 		socket.on('players', function(data){
-			console.log(data);
+			console.log('sono entrato '+data);
 			if(data === 0)
 			{
-				this.scene.start('GameScene');
+				start=true;
 			}
 		});
+	}
+	startGame()
+	{
+		if(start===true)
+		{
+			this.scene.start('GameScene');
+		}
 	}
 }
 class GameOver extends Phaser.Scene {

@@ -43,6 +43,14 @@ io.on('connection', (socket) => {
      
    
   });
+  socket.on('num', (msg) => {
+
+   
+    
+    var tmp = player[msg.nameRoom];
+    io.to(socket.id).emit('players',tmp);
+    
+  });
   socket.on(socket.id, (msg) => {
 
     var nick = msg.nickname;
