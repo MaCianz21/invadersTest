@@ -12,7 +12,9 @@ var gameOverText;
 var modeText;
 var socket;
 var classification;
+var start= false;
 var pointText;
+var loadText;
 var point = [];
 var button;
 var image;
@@ -25,7 +27,10 @@ var formCreateRoom;
 var formJoinRoom;
 var activeDescription;
 var lobby;
-var start=false;
+var load=false;
+var nickname;
+var roomName;
+var players;
 function Game()
 {
 	scene.start('GameScene');
@@ -90,8 +95,8 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
-		//lobby.stop();
-		socket = io();
+		lobby.stop();
+		//socket = io();
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
@@ -192,14 +197,11 @@ class GameScene extends Phaser.Scene
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
 		
-		socket.on("message", function(data){
+		socket.on('message', function(data){
 			var i = 1;
 			var Leaderboard = "";
-
-
-
-/*
-
+			
+			/*
 			var ordered = Object.keys(data).sort().reduce(
 				(obj, key) => { 
 				  obj[key] = data[key]; 
@@ -213,25 +215,31 @@ class GameScene extends Phaser.Scene
 			.forEach(([key, val]) => {
 				ordered[key] = val;
 			});
+			
 			var tuples = [];
 			for(var key in ordered) {
 				
-				if(ordered.hasOwnProperty(key)) {
-					tuples.push([key, ordered[key]]);
-					tuples.sort(function(a, b) {
-						a = a[1];
-						b = b[1];
-					
-						return a > b ? -1 : (a < b ? 1 : 0);
-					});
-					
+				
+					if(ordered.hasOwnProperty(key)) {
+						tuples.push([key, ordered[key]]);
+						tuples.sort(function(a, b) {
+							a = a[1];
+							b = b[1];
+						
+							return a > b ? -1 : (a < b ? 1 : 0);
+						});
+
+					}
+		}
 		
-				}
-			};
-			for (var i = 0; i < tuples.length; i++) {
+			for (var i = 0; i < tuples.length; i++) 
+			{
 				var key = tuples[i][0];
 				var value = tuples[i][1];
+				
 				Leaderboard = Leaderboard+(i+1)+'.  '+key+'\t'+value+"\n";
+				
+				
 			}
 			pointText.setText(Leaderboard);
 		});
@@ -241,7 +249,12 @@ class GameScene extends Phaser.Scene
 	}
 	update(time) {
 		
-		socket.emit(socket.id,score);
+		//socket.emit(socket.id,score);
+		socket.emit(socket.id, {
+			nickname: nickname.value,
+			score: score,
+			nameRoom: roomName.value
+		  });
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
 		{
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
@@ -303,7 +316,7 @@ class HomeScene extends Phaser.Scene {
 	}
     create ()
     {
-		
+		socket = io();
         lobby = this.sound.add('lobby');
 		lobby.play();	
 		this.add.image(550,350,'background');
@@ -336,13 +349,18 @@ class HomeScene extends Phaser.Scene {
 			
 			if (event.target.name === 'createRoom')
 			{
-				var roomName = this.getChildByName('roomName');
-				var nickname = this.getChildByName('nickname');
-				var players = this.getChildByName('players');
+			    roomName = this.getChildByName('roomName');
+			    nickname = this.getChildByName('nickname');
+			    players = this.getChildByName('players');
 			
 				if(roomName.value != '' && nickname.value!=0)
 				{
-					start=true;
+					socket.emit('createRoom',{
+						name: roomName.value,
+						numberPlayer: players.value
+					});
+					console.log(players.value);
+					load=true;
 					
 				}
 			}
@@ -378,6 +396,23 @@ class HomeScene extends Phaser.Scene {
 		
 		joinRoom.on('click', function (event) {
 
+			if (event.target.name === 'joinRoom')
+			{
+			    roomName = this.getChildByName('roomName');
+			    nickname = this.getChildByName('nickname');
+				
+			    
+			
+				if(roomName.value != '' && nickname.value!=0)
+				{
+					socket.emit('joinRoom',{
+						name: roomName.value,
+						nickname: nickname.value
+					});
+					load=true;
+					
+				}
+			}
 			
 			if (event.target.name === 'viewJoin')
 			{
@@ -385,6 +420,7 @@ class HomeScene extends Phaser.Scene {
 				formJoinRoom = this.getChildByName('joinRoom');
 				if(formJoinRoom.style.display === 'none')
 				{
+					formCreateRoom.style.display='none';
 					formJoinRoom.style.display='block';
 					
 					
@@ -392,10 +428,11 @@ class HomeScene extends Phaser.Scene {
 					image2.visible=true;
 					image3.visible=false;
 					image4.visible=false;
-					formCreateRoom.style.display='none';
+					
 					image5.visible=true;
 					
 				}
+				
 				else
 				{
 					formJoinRoom.style.display='none';
@@ -410,6 +447,43 @@ class HomeScene extends Phaser.Scene {
 		
     }
 	update()
+	{
+
+		if(load===true)
+		{
+			this.scene.start('LoadScene');
+		}
+	}
+}
+class LoadScene extends Phaser.Scene {
+
+    constructor ()
+    {
+        super('LoadScene');
+    }
+ 
+	preload() {
+		loadText = this.add.text(16, 16, 'Wait other players', { fontSize: '60px', fill: '#FFFF' });
+		
+	}
+	
+    create ()
+    {	
+    }
+	update()
+	{
+		socket.emit('num', {
+			name: roomName.value,
+		  });
+		socket.on('players', function(data){
+			console.log('sono entrato '+data);
+			if(data === 0)
+			{
+				start=true;
+			}
+		});
+	}
+	startGame()
 	{
 		if(start===true)
 		{
@@ -462,7 +536,7 @@ const config = {
     width: 1200,
     height: 700
   } ,
-	scene: [HomeScene,GameScene,GameOver]
+	scene: [HomeScene,LoadScene,GameScene,GameOver]
 };
 
 const game = new Phaser.Game(config);
