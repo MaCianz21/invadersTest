@@ -21,10 +21,13 @@ io.on('connection', (socket) => {
     
     var roomName = room.name;
     roomArray[roomName] = {};
+    roomArray[roomName][room.nickname] = 0;
     player[roomName]=room.numberPlayer -1;
-    socket.join(roomArray);
+    socket.join(roomName);
     console.log('Room '+roomName+' created  '+numRoom );
-    console.log(player[roomName]);
+    
+    var tmp = player[roomName];
+    io.to(socket.id).emit('players', tmp);
   });
  
     
@@ -38,18 +41,11 @@ io.on('connection', (socket) => {
     roomArray[roomName][room.nickname] = 0;
     player[roomName] = player[roomName]-1;
     console.log('Player '+room.nickname+' has joined in the  '+room.name );
-    console.log(player[roomName]);
-    io.to(socket.id).emit('players',player[roomName]);
+    console.log( roomArray[roomName]);
+    var tmp = player[roomName];
+    io.to(roomName).emit('players', tmp);
      
    
-  });
-  socket.on('num', (msg) => {
-
-   
-    
-    var tmp = player[msg.nameRoom];
-    io.to(socket.id).emit('players',tmp);
-    
   });
   socket.on(socket.id, (msg) => {
 

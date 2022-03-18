@@ -1,5 +1,6 @@
 import {Laser,LaserGroup} from './entity/laser.js';
 import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
+var timeLoad;
 var score = 0;
 var scoreText;
 var ammo = 3;
@@ -11,6 +12,7 @@ var startGame;
 var gameOverText;
 var modeText;
 var socket;
+var countDownText;
 var classification;
 var start= false;
 var pointText;
@@ -18,6 +20,7 @@ var loadText;
 var point = [];
 var button;
 var image;
+var nPlayer;
 var image1;
 var image2;
 var image3;
@@ -95,6 +98,7 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
+		load.stop();
 		lobby.stop();
 		//socket = io();
 		this.bass = this.sound.add('bass');
@@ -201,14 +205,6 @@ class GameScene extends Phaser.Scene
 			var i = 1;
 			var Leaderboard = "";
 			
-			/*
-			var ordered = Object.keys(data).sort().reduce(
-				(obj, key) => { 
-				  obj[key] = data[key]; 
-				  return obj;
-				}, 
-				{}
-			);*/
 			var ordered = {};
 			Object.entries(data)
 			.sort((a, b) => a[1] - b[1])
@@ -313,6 +309,7 @@ class HomeScene extends Phaser.Scene {
 		this.load.image('input2', './assets/input2.png');
 		this.load.image('buttom', './assets/buttom.png');
 		
+		
 	}
     create ()
     {
@@ -357,9 +354,13 @@ class HomeScene extends Phaser.Scene {
 				{
 					socket.emit('createRoom',{
 						name: roomName.value,
+						nickname: nickname.value,
 						numberPlayer: players.value
 					});
-					console.log(players.value);
+					
+					socket.on('players', function(data){
+						nPlayer=data;
+					});
 					load=true;
 					
 				}
@@ -409,6 +410,10 @@ class HomeScene extends Phaser.Scene {
 						name: roomName.value,
 						nickname: nickname.value
 					});
+					socket.on('players', function(data){
+						nPlayer=data;
+					});
+					
 					load=true;
 					
 				}
@@ -463,32 +468,36 @@ class LoadScene extends Phaser.Scene {
     }
  
 	preload() {
-		loadText = this.add.text(16, 16, 'Wait other players', { fontSize: '60px', fill: '#FFFF' });
-		
+	
+		this.load.image('back', './assets/backLoad.png');
+		this.load.audio('load', [ './audio/loading.ogg', './audio/loading.mp3' ]);
 	}
 	
     create ()
     {	
+		load = this.sound.add('load');
+		timeLoad = this.time.delayedCall(100000);
+		lobby.stop();
+		load.play();	
+		this.add.image(400,350,'back');
+		loadText = this.add.text(16, 16, 'Wait other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
+		countDownText = this.add.text(400, 300, '3', { fontSize: '120px', fill: '#FFFF' });
+			
     }
 	update()
 	{
-		socket.emit('num', {
-			name: roomName.value,
-		  });
-		socket.on('players', function(data){
-			console.log('sono entrato '+data);
-			if(data === 0)
-			{
-				start=true;
-			}
-		});
-	}
-	startGame()
-	{
-		if(start===true)
+		loadText.setText('Wait other players. Remaining player: '+nPlayer);
+			
+		if(nPlayer === 0)
 		{
-			this.scene.start('GameScene');
+			
+			
+				countDownText.setText('GO!');
+				this.scene.start('GameScene');
+			
 		}
+		
+		
 	}
 }
 class GameOver extends Phaser.Scene {
