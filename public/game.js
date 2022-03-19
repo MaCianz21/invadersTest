@@ -11,6 +11,8 @@ var lastLaserTime = 0;
 var startGame;
 var gameOverText;
 var modeText;
+var backBattle;
+var tuples= [];
 var socket;
 var countDownText;
 var classification;
@@ -83,7 +85,11 @@ class GameScene extends Phaser.Scene
 
 	preload() {
 		this.load.image('laser', './assets/laserBlue.png');
+		this.load.image('text', './assets/textLeaderboard.png');
+		this.load.image('first', './assets/first.png');
 		this.load.image('laserAlien', './assets/laserRed.png');
+		this.load.image('backBattle', './assets/backBattle.png');
+		this.load.image('backLeaderboard', './assets/leaderBoard.png');
 		this.load.image('ship', './assets/ship.png');
 		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
 		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);
@@ -101,6 +107,8 @@ class GameScene extends Phaser.Scene
 		load.stop();
 		lobby.stop();
 		//socket = io();
+		var inputLeaderboard=this.add.image(990,50,'text');
+		var first=this.add.image(824,130,'first');
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
@@ -111,9 +119,9 @@ class GameScene extends Phaser.Scene
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
-		modeText = this.add.text(250, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
-		classification = this.add.text(800, 16, 'Leaderboard', { fontSize: '30px', fill: '#FFFF' });
-		pointText = this.add.text(800,60, '1.', { fontSize: '20px', fill: '#FFFF' });
+		modeText = this.add.text(300, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
+		classification = this.add.text(900, 30, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		pointText = this.add.text(820,120, '1 ', { fontSize: '20px', fill: 'black' });
 		
 		this.anims.create({
 			key: "animateAlien",
@@ -128,8 +136,13 @@ class GameScene extends Phaser.Scene
 		this.addAliens();
 		this.addShip();
 		this.addEvents();
+		
 		this.physics.add.collider(this.alienGroup,this.laserGroup,removeAlien,null, this);
 		this.physics.add.overlap(this.ship,this.alienLaser,shipHit,null, this);
+	    backBattle = this.add.tileSprite(400,400, 800, 590, "backBattle");
+		backBattle.setDepth(-1);
+		var backLeaderboard = this.add.tileSprite(1050,400, 500, 800, "backLeaderboard");
+		backLeaderboard.setDepth(-1);
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -166,7 +179,7 @@ class GameScene extends Phaser.Scene
 	}
 	addEvents() {
 		this.input.on('pointermove', (pointer) => {
-			if(pointer.x<=750)
+			if(pointer.x >=80 && pointer.x<=705)
 			{
 				this.ship.x = pointer.x;
 			}
@@ -212,7 +225,7 @@ class GameScene extends Phaser.Scene
 				ordered[key] = val;
 			});
 			
-			var tuples = [];
+		    tuples = [];
 			for(var key in ordered) {
 				
 				
@@ -233,7 +246,7 @@ class GameScene extends Phaser.Scene
 				var key = tuples[i][0];
 				var value = tuples[i][1];
 				
-				Leaderboard = Leaderboard+(i+1)+'.  '+key+'\t'+value+"\n";
+				Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n";
 				
 				
 			}
@@ -265,29 +278,43 @@ class GameScene extends Phaser.Scene
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20)
 		{
+			backBattle.tilePositionY -= 1;
 			if(Math.round(time/100)%15 == 0){
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
-				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				
+				if(alienShoot.visible === true)
+				{
+					this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				}
+				
 			}
 		}
 
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40)
 		{
+			backBattle.tilePositionY -= 2;
 			if(Math.round(time/100)%10 == 0){
 				modeText.setText('Mode: Indermediate');
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
-				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				if(alienShoot.visible === true)
+				{
+					this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				}
 			}
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60)
 		{
+			backBattle.tilePositionY -= 3;
 			if(Math.round(time/100)%5 == 0){
 				modeText.setText('Mode: Hard');
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
-				this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				if(alienShoot.visible === true)
+				{
+					this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
+				}
 			}
 		}
 		
@@ -316,6 +343,7 @@ class HomeScene extends Phaser.Scene {
 		socket = io();
         lobby = this.sound.add('lobby');
 		lobby.play();	
+		var description = this.add.dom(320, 410).createFromCache('description');
 		this.add.image(550,350,'background');
 		this.add.image(200,150,'buttom');
 		this.add.image(450,150,'buttom');
@@ -329,8 +357,9 @@ class HomeScene extends Phaser.Scene {
 
 	    var joinRoom = this.add.dom(400, 600).createFromCache('joinRoom');
 		joinRoom.addListener('click');
-
-		//var description = this.add.dom(300, 400).createFromCache('description');
+		formCreateRoom = createRoom.getChildByName('createRoom');
+		formJoinRoom = joinRoom.getChildByName('joinRoom');
+		
 		
 		
 		
@@ -369,7 +398,7 @@ class HomeScene extends Phaser.Scene {
 			if (event.target.name === 'viewRoom')
 			{
 				
-				formCreateRoom = this.getChildByName('createRoom');
+				//formCreateRoom = this.getChildByName('createRoom');
 				
 				if(formCreateRoom.style.display === 'none')
 				{
@@ -383,6 +412,7 @@ class HomeScene extends Phaser.Scene {
 					
 					
 				}
+				/*
 				else
 				{
 					formCreateRoom.style.display='none';
@@ -390,7 +420,7 @@ class HomeScene extends Phaser.Scene {
 					image2.visible=false;
 					image3.visible=false;
 					image4.visible=false;
-				}
+				}*/
 			}
 	
 		});
@@ -422,7 +452,7 @@ class HomeScene extends Phaser.Scene {
 			if (event.target.name === 'viewJoin')
 			{
 				
-				formJoinRoom = this.getChildByName('joinRoom');
+				//formJoinRoom = this.getChildByName('joinRoom');
 				if(formJoinRoom.style.display === 'none')
 				{
 					formCreateRoom.style.display='none';
@@ -437,7 +467,7 @@ class HomeScene extends Phaser.Scene {
 					image5.visible=true;
 					
 				}
-				
+				/*
 				else
 				{
 					formJoinRoom.style.display='none';
@@ -445,7 +475,7 @@ class HomeScene extends Phaser.Scene {
 					image2.visible=false;
 					formCreateRoom.style.display='none';
 					image5.visible=false;
-				}
+				}*/
 			}
 	
 		});
@@ -508,19 +538,35 @@ class GameOver extends Phaser.Scene {
     }
  
 	preload() {
-		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
+		this.load.audio('lose', [ './audio/lose.ogg', './audio/lose.mp3' ]);
+		this.load.audio('win', [ './audio/win.ogg', './audio/win.mp3' ]);
+		this.load.image('text', './assets/textLeaderboard.png');
+		this.load.image('first', './assets/first.png');
 	}
     create ()
     {
-        var gameOver = this.sound.add('gameOver');	
+		var inputLeaderboard=this.add.image(990,50,'text');
+		var first=this.add.image(824,130,'first');
+        var lose = this.sound.add('lose');
+		var win = this.sound.add('win');	
 		
 		scoreText = this.add.text(16, 16, 'Score: '+score, { fontSize: '32px', fill: '#FFFF' });
-		gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
-        gameOver.play();
+		if(tuples[0][0] == nickname.value)
+		{
+			gameOverText = this.add.text(200, 300, 'YOU WIN!', { fontSize: '80px', fill: '#FF0000' });
+			win.play();
+		}
+		else
+		{
+			gameOverText = this.add.text(200, 300, 'YOU LOST!', { fontSize: '80px', fill: '#FF0000' });
+			lose.play();
+		}
+		//gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
+       
 		const helloButton = this.add.text(600, 600, 'Return homePage', { fill: '#FF0000' });
     	helloButton.setInteractive();
 
-    	helloButton.on('pointerdown', () => { this.scene.start('GameScene'); });
+    	helloButton.on('pointerdown', () => { this.scene.start('HomeScene'); });
         
     }
 }
