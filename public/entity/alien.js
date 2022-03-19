@@ -63,11 +63,5 @@ export class AlienGroup extends Phaser.Physics.Arcade.Group
 			classType: Alien,
 		});
 	}
-	allDead(){
-		const alien = this.getFirstAlive(false);
-		if(alien == null) {
-			return true;
-		}
-		return false;
-	}
+	
 }

@@ -41,19 +41,18 @@ io.on('connection', (socket) => {
     roomArray[roomName][room.nickname] = 0;
     player[roomName] = player[roomName]-1;
     console.log('Player '+room.nickname+' has joined in the  '+room.name );
-    console.log(roomArray[roomName]);
+    console.log( roomArray[roomName]);
     var tmp = player[roomName];
     io.to(roomName).emit('players', tmp);
+     
+   
   });
   socket.on(socket.id, (msg) => {
 
     var nick = msg.nickname;
     var roomName = msg.nameRoom;
-    var gameClear = "";
-    if (msg.gameClear){
-      gameClear = "🚩";
-    }
-    roomArray[roomName][nick] =  msg.score + gameClear;
+
+    roomArray[roomName][nick] =  msg.score;
     
     var tmp = roomArray[roomName];
     io.to(socket.id).emit('message',tmp);
