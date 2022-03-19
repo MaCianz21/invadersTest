@@ -115,9 +115,7 @@ class GameScene extends Phaser.Scene
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
-		
+		timedEvent = this.time.delayedCall(100000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -230,28 +228,23 @@ class GameScene extends Phaser.Scene
 			
 		    tuples = [];
 			for(var key in ordered) {
+				if(ordered.hasOwnProperty(key)) {
+					tuples.push([key, ordered[key]]);
+					tuples.sort(function(a, b) {
+						a = a[1];
+						b = b[1];
 				
-				
-					if(ordered.hasOwnProperty(key)) {
-						tuples.push([key, ordered[key]]);
-						tuples.sort(function(a, b) {
-							a = a[1];
-							b = b[1];
-						
-							return a > b ? -1 : (a < b ? 1 : 0);
-						});
+						return a > b ? -1 : (a < b ? 1 : 0);
+					});
 
-					}
-		}
+				}
+			}
 		
-			for (var i = 0; i < tuples.length; i++) 
-			{
+			for (var i = 0; i < tuples.length; i++) {
 				var key = tuples[i][0];
 				var value = tuples[i][1];
 				
 				Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n\n";
-				
-				
 			}
 			pointText.setText(Leaderboard);
 		});
@@ -260,42 +253,35 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-		
-		//socket.emit(socket.id,score);
 		socket.emit(socket.id, {
 			nickname: nickname.value,
 			score: score,
-			nameRoom: roomName.value
-		  });
-		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
-		{
+			nameRoom: roomName.value,
+			gameClear: this.alienGroup.allDead()
+		});
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
-		{
-			if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
-		    {
+
+		if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
+			if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
 				startGame.stop();
 				this.scene.start('GameOver');
 		    }
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)<0.20)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;
 			if(Math.round(time/100)%15 == 0){
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
 				
-				if(alienShoot.visible === true)
-				{
+				if(alienShoot.visible === true){
 					this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
 				}
-				
 			}
 		}
 
-		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40){
 			backBattle.tilePositionY -= 2;
 			if(Math.round(time/100)%10 == 0){
 				modeText.setText('Mode: Indermediate');
@@ -307,8 +293,7 @@ class GameScene extends Phaser.Scene
 				}
 			}
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60){
 			backBattle.tilePositionY -= 3;
 			if(Math.round(time/100)%5 == 0){
 				modeText.setText('Mode: Hard');
