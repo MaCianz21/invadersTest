@@ -109,6 +109,8 @@ class GameScene extends Phaser.Scene
 		//socket = io();
 		var inputLeaderboard=this.add.image(990,50,'text');
 		var first=this.add.image(824,130,'first');
+		lobby.stop();
+		//socket = io();
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
@@ -218,6 +220,15 @@ class GameScene extends Phaser.Scene
 			var i = 1;
 			var Leaderboard = "";
 			
+
+			/*
+			var ordered = Object.keys(data).sort().reduce(
+				(obj, key) => { 
+				  obj[key] = data[key]; 
+				  return obj;
+				}, 
+				{}
+			);*/
 			var ordered = {};
 			Object.entries(data)
 			.sort((a, b) => a[1] - b[1])
