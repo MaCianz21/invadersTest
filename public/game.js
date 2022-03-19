@@ -3,6 +3,8 @@ import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
 var timeLoad;
 var score = 0;
 var scoreText;
+var now;
+var current;
 var ammo = 3;
 var ammoText;
 var timeText;
@@ -13,9 +15,14 @@ var startGame;
 var gameOverText;
 var modeText;
 var backBattle;
+var mex;
 var tuples= [];
 var socket;
+var comment;
+var sendText;
 var finalPoints;
+var formChat;
+var Chat;
 var countDownText;
 var classification;
 var start= false;
@@ -30,6 +37,8 @@ var image2;
 var image3;
 var image4;
 var image5;
+var image6;
+var image7;
 var formCreateRoom;
 var formJoinRoom;
 var activeDescription;
@@ -38,6 +47,11 @@ var load=false;
 var nickname;
 var roomName;
 var players;
+var formJoinChat;
+function sendMessage()
+{
+	console.log('ciao');
+}
 function Game()
 {
 	scene.start('GameScene');
@@ -332,10 +346,14 @@ class HomeScene extends Phaser.Scene {
  
 	preload() {
 		this.load.image('background', './assets/background.jpg');
+		this.load.image('send', './assets/send.png');
+		
 		this.load.audio('lobby', [ './audio/lobby.ogg', './audio/lobby.mp3' ]);
 		this.load.html('login', './room.html');
 		this.load.html('joinRoom', './joinRoom.html');
+		this.load.html('joinChat', './joinChat.html');
 		this.load.html('description', './description.html');
+		this.load.html('chat', './chat.html');
 		this.load.image('input2', './assets/input2.png');
 		this.load.image('buttom', './assets/buttom.png');
 		
@@ -350,18 +368,34 @@ class HomeScene extends Phaser.Scene {
 		this.add.image(550,350,'background');
 		this.add.image(200,150,'buttom');
 		this.add.image(450,150,'buttom');
+		this.add.image(320,87,'buttom');
 		image1=this.add.image(350,250,'input2');
 		image2=this.add.image(350,350,'input2');
 		image3=this.add.image(350,450,'input2');
 		image4=this.add.image(350,570,'buttom');
 		image5=this.add.image(350,470,'buttom');
+		image6=this.add.image(350,370,'buttom');
+		image7=this.add.sprite(510,493,'send').setInteractive();
+
+		
         var createRoom = this.add.dom(400, 600).createFromCache('login');
 		createRoom.addListener('click');
 
 	    var joinRoom = this.add.dom(400, 600).createFromCache('joinRoom');
 		joinRoom.addListener('click');
+
+		var joinChat = this.add.dom(400, 600).createFromCache('joinChat');
+		joinChat.addListener('click');
+
+		
+	    Chat = this.add.dom(400, 600).createFromCache('chat');
+		Chat.addListener('click');
+			
+
 		formCreateRoom = createRoom.getChildByName('createRoom');
 		formJoinRoom = joinRoom.getChildByName('joinRoom');
+		formJoinChat = joinChat.getChildByName('createNickname');
+		formChat = Chat.getChildByName('chat');
 		
 		
 		
@@ -371,8 +405,71 @@ class HomeScene extends Phaser.Scene {
 		image3.visible=true;
 		image4.visible=true;
 		image5.visible=false;
+		image6.visible=false;
+		image7.visible=false;
 		
 		
+		
+		
+		Chat.on('click', function (event) {
+
+			mex = this.getChildByName('usermsg');
+			comment = this.getChildByName('comment');
+			image7.on('pointerdown', function (pointer) {
+
+				if(mex.value !='')
+				{
+				   comment.value+='['+nickname.value+']: '+mex.value+'           '+current+'\n';
+				   mex.value='';
+				}
+		
+			});
+			
+		});
+		joinChat.on('click', function (event) {
+			if (event.target.name === 'viewChat')
+			{
+				
+				nickname = this.getChildByName('nickname');
+				if(formJoinChat.style.display === 'none')
+				{
+					formJoinRoom.style.display='none';
+					formCreateRoom.style.display='none';
+					formJoinChat.style.display='block';
+					formChat.style.display = 'none';
+					image1.visible=true;
+					image2.visible=false;
+					image3.visible=false;
+					image4.visible=false;
+					image5.visible=false;
+					image6.visible=true;
+					
+					
+				}
+				
+			}
+			
+			if (event.target.name === 'joinChatRoom')
+			{
+				
+				nickname = this.getChildByName('nickname');
+				
+				image1.visible=false;
+				image6.visible=false;
+				formJoinChat.style.display='none';
+				if(nickname.value !='')
+				{
+					formChat.style.display = 'block';
+				    image7.visible=true;
+				}
+				
+				
+				
+				
+			}
+			
+
+		});
         createRoom.on('click', function (event) {
 			
 			
@@ -407,12 +504,15 @@ class HomeScene extends Phaser.Scene {
 				{
 					formJoinRoom.style.display='none';
 					formCreateRoom.style.display='block';
+					formJoinChat.style.display='none';
+					formChat.style.display = 'none';
 					image1.visible=true;
 					image2.visible=true;
 					image3.visible=true;
 					image4.visible=true;
 					image5.visible=false;
-					
+					image6.visible=false;
+					image7.visible=false;
 					
 				}
 				/*
@@ -460,15 +560,15 @@ class HomeScene extends Phaser.Scene {
 				{
 					formCreateRoom.style.display='none';
 					formJoinRoom.style.display='block';
-					
-					
+					formJoinChat.style.display='none';
+					formChat.style.display = 'none';
 					image1.visible=true;
 					image2.visible=true;
 					image3.visible=false;
 					image4.visible=false;
-					
 					image5.visible=true;
-					
+					image6.visible=false;
+					image7.visible=false;
 				}
 				/*
 				else
@@ -486,7 +586,8 @@ class HomeScene extends Phaser.Scene {
     }
 	update()
 	{
-
+		now = new Date();
+        current = now.getHours() + ':' + now.getMinutes();
 		if(load===true)
 		{
 			this.scene.start('LoadScene');
