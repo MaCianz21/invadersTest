@@ -8,12 +8,14 @@ var ammoText;
 var timeText;
 var timedEvent;
 var lastLaserTime = 0;
+var Leaderboard;
 var startGame;
 var gameOverText;
 var modeText;
 var backBattle;
 var tuples= [];
 var socket;
+var finalPoints;
 var countDownText;
 var classification;
 var start= false;
@@ -113,7 +115,8 @@ class GameScene extends Phaser.Scene
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 
-		timedEvent = this.time.delayedCall(100000);
+		//timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 		
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
@@ -216,7 +219,7 @@ class GameScene extends Phaser.Scene
 		
 		socket.on('message', function(data){
 			var i = 1;
-			var Leaderboard = "";
+		    Leaderboard = "";
 			
 			var ordered = {};
 			Object.entries(data)
@@ -246,7 +249,7 @@ class GameScene extends Phaser.Scene
 				var key = tuples[i][0];
 				var value = tuples[i][1];
 				
-				Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n";
+				Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n\n";
 				
 				
 			}
@@ -542,28 +545,39 @@ class GameOver extends Phaser.Scene {
 		this.load.audio('win', [ './audio/win.ogg', './audio/win.mp3' ]);
 		this.load.image('text', './assets/textLeaderboard.png');
 		this.load.image('first', './assets/first.png');
+		this.load.image('backLeaderboard', './assets/leaderBoard.png');
+		this.load.image('gameWin', './assets/win.png');
+		this.load.image('gameLose', './assets/lose.png');
+		this.load.image('buttom', './assets/buttom.png');
 	}
     create ()
     {
+		finalPoints = this.add.text(820,120, '1  ', { fontSize: '20px', fill: 'black' });
+		finalPoints.setText(Leaderboard);
+		this.add.image(600,600,'buttom');
 		var inputLeaderboard=this.add.image(990,50,'text');
+		classification = this.add.text(900, 30, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
 		var first=this.add.image(824,130,'first');
+		var backLeaderboard = this.add.tileSprite(1050,400, 500, 800, "backLeaderboard");
+		backLeaderboard.setDepth(-1);
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
 		
-		scoreText = this.add.text(16, 16, 'Score: '+score, { fontSize: '32px', fill: '#FFFF' });
 		if(tuples[0][0] == nickname.value)
 		{
-			gameOverText = this.add.text(200, 300, 'YOU WIN!', { fontSize: '80px', fill: '#FF0000' });
+			var gameWin=this.add.image(365,300,'gameWin');
+			gameOverText = this.add.text(295, 335, 'YOU WIN', { fontSize: '30px', fill: 'white' });
 			win.play();
 		}
 		else
 		{
-			gameOverText = this.add.text(200, 300, 'YOU LOST!', { fontSize: '80px', fill: '#FF0000' });
+			var gameLose=this.add.image(365,440,'gameLose');
+			gameOverText = this.add.text(295, 335, 'YOU LOSE', { fontSize: '30px', fill: 'white' });
 			lose.play();
 		}
 		//gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
        
-		const helloButton = this.add.text(600, 600, 'Return homePage', { fill: '#FF0000' });
+		const helloButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
     	helloButton.setInteractive();
 
     	helloButton.on('pointerdown', () => { this.scene.start('HomeScene'); });
