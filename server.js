@@ -10,6 +10,9 @@ var point={};
 var id;
 var roomArray={};
 var numRoom=0;
+var now;
+var mes={};
+var current;
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -46,6 +49,18 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('players', tmp);
      
    
+  });
+  socket.on('mex', (msg) => {
+
+    now = new Date();
+    current = now.getHours() + ':' + now.getMinutes();
+    mes.nickname = msg.nickname;
+    mes.mex=msg.mex;
+    mes.time=current;
+
+  
+    io.emit('response',mes);
+    
   });
   socket.on(socket.id, (msg) => {
 

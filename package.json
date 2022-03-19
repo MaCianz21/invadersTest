@@ -4,6 +4,8 @@
   "main": "index.html",
   "dependencies": {
     "express": "^4.17.3",
+    "git": "^0.1.5",
+    "git-all": "^0.0.3",
     "socket.io": "^4.4.1"
   },
   "scripts": {

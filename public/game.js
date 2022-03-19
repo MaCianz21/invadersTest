@@ -3,8 +3,6 @@ import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
 var timeLoad;
 var score = 0;
 var scoreText;
-var now;
-var current;
 var ammo = 3;
 var ammoText;
 var timeText;
@@ -100,6 +98,7 @@ class GameScene extends Phaser.Scene
 	}
 
 	preload() {
+		
 		this.load.image('laser', './assets/laserBlue.png');
 		this.load.image('text', './assets/textLeaderboard.png');
 		this.load.image('first', './assets/first.png');
@@ -123,22 +122,22 @@ class GameScene extends Phaser.Scene
 		load.stop();
 		lobby.stop();
 		//socket = io();
-		var inputLeaderboard=this.add.image(990,50,'text');
-		var first=this.add.image(824,130,'first');
+		var inputLeaderboard=this.add.image(990,150,'text');
+		var first=this.add.image(824,230,'first');
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(100000);
+		//timedEvent = this.time.delayedCall(3000);
 		
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modeText = this.add.text(300, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
-		classification = this.add.text(900, 30, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
-		pointText = this.add.text(820,120, '1 ', { fontSize: '20px', fill: 'black' });
+		classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		pointText = this.add.text(820,220, '1 ', { fontSize: '20px', fill: 'black' });
 		
 		this.anims.create({
 			key: "animateAlien",
@@ -158,7 +157,7 @@ class GameScene extends Phaser.Scene
 		this.physics.add.overlap(this.ship,this.alienLaser,shipHit,null, this);
 	    backBattle = this.add.tileSprite(400,400, 800, 590, "backBattle");
 		backBattle.setDepth(-1);
-		var backLeaderboard = this.add.tileSprite(1050,400, 500, 800, "backLeaderboard");
+		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
 	}
 	addAliens(){
@@ -410,7 +409,10 @@ class HomeScene extends Phaser.Scene {
 		
 		
 		
-		
+		socket.on('response', function(data){
+			comment.value += '['+data.nickname+']'+  data.mex+'        '+data.time+'\n';
+			
+		});
 		Chat.on('click', function (event) {
 
 			mex = this.getChildByName('usermsg');
@@ -419,13 +421,18 @@ class HomeScene extends Phaser.Scene {
 
 				if(mex.value !='')
 				{
-				   comment.value+='['+nickname.value+']: '+mex.value+'           '+current+'\n';
-				   mex.value='';
+					socket.emit('mex',{
+						nickname: nickname.value,
+						mex: mex.value
+					})
+				   	//comment.value+='['+nickname.value+']: '+mex.value+'           '+current+'\n';
+				   	mex.value='';
 				}
 		
 			});
 			
 		});
+		
 		joinChat.on('click', function (event) {
 			if (event.target.name === 'viewChat')
 			{
@@ -586,8 +593,6 @@ class HomeScene extends Phaser.Scene {
     }
 	update()
 	{
-		now = new Date();
-        current = now.getHours() + ':' + now.getMinutes();
 		if(load===true)
 		{
 			this.scene.start('LoadScene');
@@ -615,7 +620,7 @@ class LoadScene extends Phaser.Scene {
 		load.play();	
 		this.add.image(400,350,'back');
 		loadText = this.add.text(16, 16, 'Wait other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
-		countDownText = this.add.text(400, 300, '3', { fontSize: '120px', fill: '#FFFF' });
+		countDownText = this.add.text(400, 300, '', { fontSize: '120px', fill: '#FFFF' });
 			
     }
 	update()
@@ -653,13 +658,13 @@ class GameOver extends Phaser.Scene {
 	}
     create ()
     {
-		finalPoints = this.add.text(820,120, '1  ', { fontSize: '20px', fill: 'black' });
+		finalPoints = this.add.text(820,220, '1  ', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
-		var inputLeaderboard=this.add.image(990,50,'text');
-		classification = this.add.text(900, 30, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
-		var first=this.add.image(824,130,'first');
-		var backLeaderboard = this.add.tileSprite(1050,400, 500, 800, "backLeaderboard");
+		var inputLeaderboard=this.add.image(990,150,'text');
+		classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		var first=this.add.image(824,230,'first');
+		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
@@ -681,7 +686,8 @@ class GameOver extends Phaser.Scene {
 		const helloButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
     	helloButton.setInteractive();
 
-    	helloButton.on('pointerdown', () => { this.scene.start('HomeScene'); });
+		
+    	helloButton.on('pointerdown', () => { this.registry.destroy();this.scene.start('HomeScene'); });
         
     }
 }
