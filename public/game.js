@@ -1,6 +1,7 @@
 import {Laser,LaserGroup} from './entity/laser.js';
 import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
 var timeLoad;
+var load;
 var score = 0;
 var scoreText;
 var ammo = 3;
@@ -11,12 +12,16 @@ var lastLaserTime = 0;
 var Leaderboard;
 var startGame;
 var gameOverText;
+var load3=false;
 var modeText;
+var modalTextNickname;
+var modalTextRoom;
 var backBattle;
 var mex;
 var tuples= [];
 var socket;
 var comment;
+var goLoad=false;
 var sendText;
 var finalPoints;
 var formChat;
@@ -42,7 +47,8 @@ var formCreateRoom;
 var formJoinRoom;
 var activeDescription;
 var lobby;
-var load=false;
+var load1=false;
+var load2=false;
 var nickname;
 var roomName;
 var players;
@@ -63,7 +69,6 @@ function removeAlien(alien,laser){
 	score += 10;
 	scoreText.setText('Score: ' + score);
 }
-
 
 function shipHit(ship,laser){
 	var kill = this.sound.add('kill');
@@ -275,26 +280,23 @@ class GameScene extends Phaser.Scene
 	}
 	update(time) {
 		
-		//socket.emit(socket.id,score);
 		socket.emit(socket.id, {
 			nickname: nickname.value,
 			score: score,
 			nameRoom: roomName.value
-		  });
-		if(timedEvent.getProgress().toString().substr(0, 4)<0.60)
-		{
+		});
+
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
 			if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
 		    {
 				startGame.stop();
 				this.scene.start('GameOver');
 		    }
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)<0.20)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;
 			if(Math.round(time/100)%15 == 0){
 				var random = Phaser.Math.Between(0, 49);
@@ -308,8 +310,7 @@ class GameScene extends Phaser.Scene
 			}
 		}
 
-		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40)
-		{
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40){
 			backBattle.tilePositionY -= 2;
 			if(Math.round(time/100)%10 == 0){
 				modeText.setText('Mode: Indermediate');
@@ -363,6 +364,10 @@ class HomeScene extends Phaser.Scene {
     create ()
     {
 		socket = io();
+		modalTextRoom = this.add.text(200, 353, '', { fontSize: '14px', fill: 'white' });
+		modalTextNickname = this.add.text(200, 456, '', { fontSize: '14px', fill: 'white' });
+		modalTextRoom.setDepth(1);
+		modalTextNickname.setDepth(1);
         lobby = this.sound.add('lobby');
 		lobby.play();	
 		var description = this.add.dom(320, 410).createFromCache('description');
@@ -391,15 +396,12 @@ class HomeScene extends Phaser.Scene {
 		
 	    Chat = this.add.dom(400, 600).createFromCache('chat');
 		Chat.addListener('click');
-			
-
+		
 		formCreateRoom = createRoom.getChildByName('createRoom');
 		formJoinRoom = joinRoom.getChildByName('joinRoom');
 		formJoinChat = joinChat.getChildByName('createNickname');
 		formChat = Chat.getChildByName('chat');
-		
-		
-		
+		comment = Chat.getChildByName('comment');
 		
 		image1.visible=true;
 		image2.visible=true;
@@ -412,36 +414,32 @@ class HomeScene extends Phaser.Scene {
 		
 		
 		socket.on('response', function(data){
-			comment.value += '['+data.nickname+']'+  data.mex+'        '+data.time+'\n';
+			console.log(data);
+			comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
 		});
+		
+		
 		Chat.on('click', function (event) {
-
 			mex = this.getChildByName('usermsg');
-			comment = this.getChildByName('comment');
+			//comment = this.getChildByName('comment');
 			image7.on('pointerdown', function (pointer) {
-
 				if(mex.value !='')
 				{
 					socket.emit('mex',{
 						nickname: nickname.value,
 						mex: mex.value
-					})
+					});
 				   	mex.value='';
 				}
-		
 			});
 			
 		});
 		
 		joinChat.on('click', function (event) {
-			if (event.target.name === 'viewChat')
-			{
-				
+			if (event.target.name === 'viewChat'){
 				nickname = this.getChildByName('nickname');
-				if(formJoinChat.style.display === 'none')
-				{
-					if(nickname.value === '')
-					{
+				if(formJoinChat.style.display === 'none'){
+					if(nickname.value === ''){
 						formJoinRoom.style.display='none';
 						formCreateRoom.style.display='none';
 						formJoinChat.style.display='block';
@@ -454,9 +452,10 @@ class HomeScene extends Phaser.Scene {
 						image6.visible=true;
 						image7.visible=false;
 						image8.visible=false;
+						modalTextNickname.setText('');
+					    modalTextRoom.setText('');
 					}
-					else
-					{
+					else{
 						image2.visible=false;
 						image3.visible=false;
 						image4.visible=false;
@@ -470,66 +469,108 @@ class HomeScene extends Phaser.Scene {
 						formChat.style.display = 'block';
 						image7.visible=true;
 						image8.visible=true;
-
+						modalTextNickname.setText('');
+					    modalTextRoom.setText('');
 					}
-					
 				}
-				
 			}
 			
-			if (event.target.name === 'joinChatRoom')
-			{
+			if (event.target.name === 'joinChatRoom'){
 				
+				//joining the global chat
+				
+
 				nickname = this.getChildByName('nickname');
-				
-				image1.visible=false;
-				image6.visible=false;
-				formJoinChat.style.display='none';
-				
-				formChat.style.display = 'block';
-				image7.visible=true;
-				image8.visible=true;
-				
-				
-				
-				
+				if(nickname.value==='')
+				{
+					modalTextRoom.setText('Insert nickname');
+				}
+				else
+				{
+					socket.emit('userJoin',{
+						nickname: nickname.value
+					});
+					image1.visible=false;
+					image6.visible=false;
+					formJoinChat.style.display='none';
+					
+					formChat.style.display = 'block';
+					image7.visible=true;
+					image8.visible=true;
+				}
 				
 			}
 			
 
 		});
+
         createRoom.on('click', function (event) {
-			
-			
-			if (event.target.name === 'createRoom')
-			{
+			if (event.target.name === 'createRoom'){
 			    roomName = this.getChildByName('roomName');
 			    nickname = this.getChildByName('nickname');
 			    players = this.getChildByName('players');
 			
-				if(roomName.value != '' && nickname.value!=0)
+				if(roomName.value === '')
 				{
+					modalTextRoom.setText('Insert room name');
+				}
+				if(nickname.value === '')
+				{
+					modalTextNickname.setText('Insert nickname');
+				}
+				if(roomName.value != '' && nickname.value!=0){
 					socket.emit('createRoom',{
 						name: roomName.value,
 						nickname: nickname.value,
 						numberPlayer: players.value
 					});
 					
+					socket.on('nickname', function(data){
+						console.log(data);
+						if(data==='exist')
+						{
+							modalTextNickname.setText('Nickname '+nickname.value+' already exist');
+							
+						}
+						else
+						{
+							load1=true;
+							load3=true;
+						}
+						
+					});
+					socket.on('checkRoom', function(data){
+						console.log(data);
+						if(data==='exist')
+						{
+							modalTextRoom.setText('Room '+roomName.value+' already exist');
+							
+							
+						}
+						else
+						{
+							load2=true;
+							load3=true;
+						}
+						
+					});
+
+					
+					
+					/*
+					socket.on('room', function(data){
+						nPlayer=data;
+					});*/
 					socket.on('players', function(data){
 						nPlayer=data;
 					});
-					load=true;
+					
 					
 				}
 			}
 			
-			if (event.target.name === 'viewRoom')
-			{
-				
-				//formCreateRoom = this.getChildByName('createRoom');
-				
-				if(formCreateRoom.style.display === 'none')
-				{
+			if (event.target.name === 'viewRoom'){
+				if(formCreateRoom.style.display === 'none'){
 					formJoinRoom.style.display='none';
 					formCreateRoom.style.display='block';
 					formJoinChat.style.display='none';
@@ -542,17 +583,10 @@ class HomeScene extends Phaser.Scene {
 					image6.visible=false;
 					image7.visible=false;
 					image8.visible=false;
+					modalTextNickname.setText('');
+					modalTextRoom.setText('');
 					
 				}
-				/*
-				else
-				{
-					formCreateRoom.style.display='none';
-					image1.visible=false;
-					image2.visible=false;
-					image3.visible=false;
-					image4.visible=false;
-				}*/
 			}
 	
 		});
@@ -563,28 +597,72 @@ class HomeScene extends Phaser.Scene {
 			{
 			    roomName = this.getChildByName('roomName');
 			    nickname = this.getChildByName('nickname');
-				
-			    
-			
+				if(roomName.value === '')
+				{
+					modalTextRoom.setText('Insert room name');
+				}
+				if(nickname.value === '')
+				{
+					modalTextNickname.setText('Insert nickname');
+				}
 				if(roomName.value != '' && nickname.value!=0)
 				{
 					socket.emit('joinRoom',{
 						name: roomName.value,
 						nickname: nickname.value
 					});
+					
+					socket.on('nickname', function(data){
+						console.log(data);
+						if(data==='exist')
+						{
+							modalTextNickname.setText('Nickname '+nickname.value+' already exist');
+							
+						}
+						else
+						{
+							load1=true;
+						}
+						
+					});
+					socket.on('checkRoom', function(data){
+						console.log(data);
+						if(data==='exist')
+						{
+							load2=true;
+							
+							
+						}
+						else
+						{
+							modalTextRoom.setText('Room '+roomName.value+' not exist');
+						}
+						
+					});
+					socket.on('checkPlayer', function(data){
+						console.log(data);
+						if(data!='prohibited')
+						{
+							load3=true;
+							
+							
+						}
+						else
+						{
+							modalTextRoom.setText('Number of players reached');
+						}
+						
+					});
 					socket.on('players', function(data){
 						nPlayer=data;
 					});
 					
-					load=true;
 					
 				}
 			}
 			
 			if (event.target.name === 'viewJoin')
 			{
-				
-				//formJoinRoom = this.getChildByName('joinRoom');
 				if(formJoinRoom.style.display === 'none')
 				{
 					formCreateRoom.style.display='none';
@@ -599,25 +677,18 @@ class HomeScene extends Phaser.Scene {
 					image6.visible=false;
 					image7.visible=false;
 					image8.visible=false;
+					modalTextNickname.setText('');
+					modalTextRoom.setText('');
+					
 				}
-				/*
-				else
-				{
-					formJoinRoom.style.display='none';
-					image1.visible=false;
-					image2.visible=false;
-					formCreateRoom.style.display='none';
-					image5.visible=false;
-				}*/
 			}
-	
 		});
 		
     }
 	update()
 	{
 		
-		if(load===true)
+		if(load1===true && load2===true && load3===true)
 		{
 			this.scene.start('LoadScene');
 		}
