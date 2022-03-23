@@ -139,8 +139,8 @@ class GameScene extends Phaser.Scene
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 
-		timedEvent = this.time.delayedCall(100000);
-		//timedEvent = this.time.delayedCall(3000);
+		//timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 		
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
@@ -826,8 +826,10 @@ class GameOver extends Phaser.Scene {
     	helloButton.setInteractive();
 
 		helloButton.on('pointerdown', function (pointer) {
-
-            this.scene.start('HomeScene');
+			load1=false;
+			load2=false;
+			load3=false;
+            this.scene.switch('HomeScene');
 
         }, this);
     	//helloButton.on('pointerdown', () => {reloadGame});
