@@ -53,6 +53,11 @@ var nickname;
 var roomName;
 var players;
 var formJoinChat;
+
+function reloadGame()
+{
+	this.start('HomeScene');
+}
 function sendMessage()
 {
 	console.log('ciao');
@@ -111,13 +116,13 @@ class GameScene extends Phaser.Scene
 		this.load.image('laserAlien', './assets/laserRed.png');
 		this.load.image('backBattle', './assets/backBattle.png');
 		this.load.image('backLeaderboard', './assets/leaderBoard.png');
-		this.load.image('ship', './assets/ship.png');
-		this.load.spritesheet("alien","./assets/alien.png",{frameWidth: 48,frameHeight: 32});
+		this.load.image('ship', './assets/ship2.png');
+		this.load.spritesheet("alien","./assets/alien2.png",{frameWidth: 48,frameHeight: 32});
 		this.load.audio('bass', [ './audio/blaster.ogg', './audio/blaster.mp3' ]);
 		this.load.audio('explosion', [ './audio/explosion.ogg', './audio/explosion.mp3' ]);
 		this.load.audio('ammo', [ './audio/ammo.ogg', './audio/ammo.mp3' ]);
 		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
-		this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
+		//this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
 		this.load.audio('startGame', [ './audio/game.ogg', './audio/game.mp3' ]);
 		this.load.audio('kill', [ './audio/kill.ogg', './audio/kill.mp3' ]);
 		this.load.audio('shootDelay', [ './audio/Click1.wav' ]);
@@ -141,8 +146,9 @@ class GameScene extends Phaser.Scene
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
-		modeText = this.add.text(300, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
+		modeText = this.add.text(500, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
 		classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		classification.style.fontFamily='Common Pixel';
 		pointText = this.add.text(820,220, '1 ', { fontSize: '20px', fill: 'black' });
 		
 		this.anims.create({
@@ -196,6 +202,16 @@ class GameScene extends Phaser.Scene
 			var ammoEffect = this.sound.add('ammo');	
 			ammoEffect.play();
 			ammo=3;
+			if(score >2)
+			{
+				score = score-2;
+				scoreText.setText('Score: ' + score);
+			}
+			else
+			{
+				score = 0;
+				scoreText.setText('Score: ' + score);
+			}
 			ammoText.setText('Ammo : ' + ammo);
 		}
 	}
@@ -412,12 +428,25 @@ class HomeScene extends Phaser.Scene {
 		image7.visible=false;
 		image8.visible=false;
 		
-		
 		socket.on('response', function(data){
-			console.log(data);
-			comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
+			if(data==='exist')
+			{
+				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
+			}
+			else
+			{
+				image1.visible=false;
+				image6.visible=false;
+				formJoinChat.style.display='none';
+				
+				formChat.style.display = 'block';
+				image7.visible=true;
+				image8.visible=true;
+				comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
+				
+
+			}
 		});
-		
 		
 		Chat.on('click', function (event) {
 			mex = this.getChildByName('usermsg');
@@ -490,13 +519,28 @@ class HomeScene extends Phaser.Scene {
 					socket.emit('userJoin',{
 						nickname: nickname.value
 					});
-					image1.visible=false;
-					image6.visible=false;
-					formJoinChat.style.display='none';
+					/*
+					socket.on('response', function(data){
+						if(data==='exist')
+						{
+							modalTextRoom.setText('Nickname '+nickname.value+' already exist');
+						}
+						else
+						{
+							image1.visible=false;
+							image6.visible=false;
+							formJoinChat.style.display='none';
+							
+							formChat.style.display = 'block';
+							image7.visible=true;
+							image8.visible=true;
+							comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
+							console.log('ciao');
+						}
+					});
+					*/
 					
-					formChat.style.display = 'block';
-					image7.visible=true;
-					image8.visible=true;
+					
 				}
 				
 			}
@@ -781,8 +825,12 @@ class GameOver extends Phaser.Scene {
 		const helloButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
     	helloButton.setInteractive();
 
-		
-    	helloButton.on('pointerdown', () => { this.registry.destroy();this.scene.start('HomeScene'); });
+		helloButton.on('pointerdown', function (pointer) {
+
+            this.scene.start('HomeScene');
+
+        }, this);
+    	//helloButton.on('pointerdown', () => {reloadGame});
         
     }
 }

@@ -5,6 +5,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 var player={};
+var nickChat={};
 app.use(express.static(__dirname + '/public'));
 var point={};
 var id;
@@ -34,28 +35,29 @@ io.on('connection', (socket) => {
     {
       io.to(socket.id).emit('checkRoom', 'not exist');
       roomArray[roomName] = {};
+      if(roomArray[roomName][room.nickname]!= undefined)
+      {
+        io.to(socket.id).emit('nickname', 'exist');
+        
+      }
+      else
+      {
+        io.to(socket.id).emit('nickname', 'not exist');
+        
+        roomArray[roomName][room.nickname] = 0;
+        
+        player[roomName]=room.numberPlayer -1;
+        socket.join(roomName);
+        console.log('Room '+roomName+' created  '+numRoom );
+        
+        var tmp = player[roomName];
+        io.to(socket.id).emit('players', tmp);
+      }
     }
     
     
     
-    if(roomArray[roomName][room.nickname]!= undefined)
-    {
-      io.to(socket.id).emit('nickname', 'exist');
-      
-    }
-    else
-    {
-      io.to(socket.id).emit('nickname', 'not exist');
-      
-      roomArray[roomName][room.nickname] = 0;
-      
-      player[roomName]=room.numberPlayer -1;
-      socket.join(roomName);
-      console.log('Room '+roomName+' created  '+numRoom );
-      
-      var tmp = player[roomName];
-      io.to(socket.id).emit('players', tmp);
-    }
+    
     
     
   });
@@ -118,12 +120,31 @@ io.on('connection', (socket) => {
   socket.on('userJoin', (msg) => {
     var mes={};
     now = new Date();
+    var nickname=msg.nickname;
+    
     current = now.getHours() + ':' + now.getMinutes();
-    mes.nickname = msg.nickname;
-    mes.mex=("joined the global chat");
-    mes.time=current;
-
-    io.sockets.emit('response',mes);
+    if(nickChat[nickname] != undefined)
+    {
+      console.log('exist');
+      io.sockets.emit('response','exist');
+      
+     
+    }
+    else
+    {
+      
+      nickChat[nickname]=nickname;
+      console.log('not exist');
+      mes.nickname = nickChat[nickname];
+     
+      mes.mex=("joined the global chat");
+      mes.time=current;
+      io.sockets.emit('response',mes);
+      //io.emit('response',mes);
+      //io.sockets.emit('response',mes);
+     
+    }
+   
   });
 
   socket.on(socket.id, (msg) => {
