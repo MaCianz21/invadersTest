@@ -7,7 +7,6 @@ const io = new Server(server);
 var player={};
 var nickChat={};
 app.use(express.static(__dirname + '/public'));
-var point={};
 var id;
 var roomArray={};
 var numRoom=0;
@@ -147,6 +146,13 @@ io.on('connection', (socket) => {
    
   });
 
+  socket.on('deleteRoom', function(room) {
+      console.log(roomArray);
+      delete roomArray[room.nameRoom];
+      console.log(roomArray);
+      
+  });
+
   socket.on(socket.id, (msg) => {
 
     var nick = msg.nickname;
@@ -159,8 +165,6 @@ io.on('connection', (socket) => {
     
   });
   socket.on('disconnect', () => {
-    delete point[socket.id];
-    
     console.log('user '+socket.id+' disconnected');
   });
 });

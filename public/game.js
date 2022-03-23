@@ -797,6 +797,9 @@ class GameOver extends Phaser.Scene {
 	}
     create ()
     {
+		socket.emit('deleteRoom', {
+			nameRoom: roomName.value
+		});
 		finalPoints = this.add.text(820,220, '1  ', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
@@ -826,10 +829,15 @@ class GameOver extends Phaser.Scene {
     	helloButton.setInteractive();
 
 		helloButton.on('pointerdown', function (pointer) {
+			Leaderboard='';
+			classification='';
+			lastLaserTime=0;
+			score=0;
+			ammo=3;
 			load1=false;
 			load2=false;
 			load3=false;
-            this.scene.switch('HomeScene');
+            this.scene.start('HomeScene');
 
         }, this);
     	//helloButton.on('pointerdown', () => {reloadGame});
