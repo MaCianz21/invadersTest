@@ -16,6 +16,9 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
+
+
+
 io.on('connection', (socket) => {
   console.log('user '+socket.id+' connected');
 
@@ -92,6 +95,7 @@ io.on('connection', (socket) => {
           console.log( roomArray[roomName]);
           var tmp = player[roomName];
           io.to(roomName).emit('players', tmp);
+          
         }
        
       }

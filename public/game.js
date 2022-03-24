@@ -139,8 +139,8 @@ class GameScene extends Phaser.Scene
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(100000);
+		//timedEvent = this.time.delayedCall(3000);
 		
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
@@ -295,7 +295,6 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-		
 		socket.emit(socket.id, {
 			nickname: nickname.value,
 			score: score,
