@@ -255,20 +255,12 @@ class GameScene extends Phaser.Scene
 		socket.on('message', function(data){
 			var i = 1;
 		    Leaderboard = "";
-			
-			var ordered = {};
-			Object.entries(data)
-			.sort((a, b) => a[1] - b[1])
-			.forEach(([key, val]) => {
-				ordered[key] = val;
-			});
-			
 		    tuples = [];
-			for(var key in ordered) {
+			for(var key in data) {
 				
 				
-					if(ordered.hasOwnProperty(key)) {
-						tuples.push([key, ordered[key]]);
+					if(data.hasOwnProperty(key)) {
+						tuples.push([key, data[key]]);
 						tuples.sort(function(a, b) {
 							a = a[1];
 							b = b[1];
@@ -518,28 +510,6 @@ class HomeScene extends Phaser.Scene {
 					socket.emit('userJoin',{
 						nickname: nickname.value
 					});
-					/*
-					socket.on('response', function(data){
-						if(data==='exist')
-						{
-							modalTextRoom.setText('Nickname '+nickname.value+' already exist');
-						}
-						else
-						{
-							image1.visible=false;
-							image6.visible=false;
-							formJoinChat.style.display='none';
-							
-							formChat.style.display = 'block';
-							image7.visible=true;
-							image8.visible=true;
-							comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
-							console.log('ciao');
-						}
-					});
-					*/
-					
-					
 				}
 				
 			}
@@ -598,12 +568,6 @@ class HomeScene extends Phaser.Scene {
 						
 					});
 
-					
-					
-					/*
-					socket.on('room', function(data){
-						nPlayer=data;
-					});*/
 					socket.on('players', function(data){
 						nPlayer=data;
 					});
@@ -753,7 +717,6 @@ class LoadScene extends Phaser.Scene {
     create ()
     {	
 		load = this.sound.add('load');
-		timeLoad = this.time.delayedCall(100000);
 		lobby.stop();
 		load.play();	
 		this.add.image(400,350,'back');
@@ -839,7 +802,7 @@ class GameOver extends Phaser.Scene {
             this.scene.start('HomeScene');
 
         }, this);
-    	//helloButton.on('pointerdown', () => {reloadGame});
+    	
         
     }
 }
