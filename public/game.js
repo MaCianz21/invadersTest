@@ -57,6 +57,7 @@ var nickname;
 var roomName;
 var players;
 var formJoinChat;
+var playerNumber;
 
 function reloadGame()
 {
@@ -180,29 +181,27 @@ class GameScene extends Phaser.Scene
 		backBattle.setDepth(-1);
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
-		var leaderB=this.add.image(1000,400,'lB4');
-		leaderB.setDepth(-1);
-		/*
-		if(player==1)
-		{
-			var leaderB=this.add.image(1000,400,'lB1');
-		    leaderB.setDepth(-1);
+		switch(playerNumber){
+			case 1:
+				var leaderB=this.add.image(1000,400,'lB1');
+				leaderB.setDepth(-1);
+				break;
+			case 2:
+				var leaderB=this.add.image(1000,400,'lB2');
+				leaderB.setDepth(-1);
+				break;
+			case 3:
+				var leaderB=this.add.image(1000,400,'lB3');
+				leaderB.setDepth(-1);
+				break;
+			case 4:
+				var leaderB=this.add.image(1000,400,'lB4');
+				leaderB.setDepth(-1);
+				break;
+			default:
+				console.log("error");
+				break;
 		}
-		if(player==2)
-		{
-			var leaderB=this.add.image(1000,400,'lB2');
-		    leaderB.setDepth(-1);
-		}
-		if(player==3)
-		{
-			var leaderB=this.add.image(1000,400,'lB3');
-		    leaderB.setDepth(-1);
-		}
-		if(player==4)
-		{
-			var leaderB=this.add.image(1000,400,'lB4');
-		    leaderB.setDepth(-1);
-		}*/
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -792,11 +791,16 @@ class LoadScene extends Phaser.Scene {
 		
 		if(nPlayer === 0)
 		{
+			socket.emit('displayLB',{
+				name: roomName.value
+			});
 			
-			
-				countDownText.setText('GO!');
-				this.scene.start('GameScene');
-			
+			socket.on('displayLB_response', function(data){
+				playerNumber = data.roomCapacity;
+			});
+
+			countDownText.setText('GO!');
+			this.scene.start('GameScene');
 		}
 		
 		
@@ -835,29 +839,29 @@ class GameOver extends Phaser.Scene {
 		
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
-		var leaderB=this.add.image(1000,400,'lB4');
-		leaderB.setDepth(-1);
-		/*
-		if(players.value==1)
-		{
-			var leaderB=this.add.image(1000,400,'lB1');
-		    leaderB.setDepth(-1);
+		
+		switch(playerNumber){
+			case 1:
+				var leaderB=this.add.image(1000,400,'lB1');
+				leaderB.setDepth(-1);
+				break;
+			case 2:
+				var leaderB=this.add.image(1000,400,'lB2');
+				leaderB.setDepth(-1);
+				break;
+			case 3:
+				var leaderB=this.add.image(1000,400,'lB3');
+				leaderB.setDepth(-1);
+				break;
+			case 4:
+				var leaderB=this.add.image(1000,400,'lB4');
+				leaderB.setDepth(-1);
+				break;
+			default:
+				console.log("error");
+				break;
 		}
-		if(players.value==2)
-		{
-			var leaderB=this.add.image(1000,400,'lB2');
-		    leaderB.setDepth(-1);
-		}
-		if(players.value==3)
-		{
-			var leaderB=this.add.image(1000,400,'lB3');
-		    leaderB.setDepth(-1);
-		}
-		if(players.value==4)
-		{
-			var leaderB=this.add.image(1000,400,'lB4');
-		    leaderB.setDepth(-1);
-		}*/
+
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
 		
@@ -880,7 +884,6 @@ class GameOver extends Phaser.Scene {
 
 		helloButton.on('pointerdown', function (pointer) {
 			Leaderboard='';
-			//classification='';
 			lastLaserTime=0;
 			score=0;
 			ammo=3;

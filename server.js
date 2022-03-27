@@ -130,8 +130,6 @@ io.on('connection', (socket) => {
     {
       console.log('exist');
       io.sockets.emit('response','exist');
-      
-     
     }
     else
     {
@@ -142,10 +140,7 @@ io.on('connection', (socket) => {
      
       mes.mex=("joined the global chat");
       mes.time=current;
-      io.sockets.emit('response',mes);
-      //io.emit('response',mes);
-      //io.sockets.emit('response',mes);
-     
+      io.sockets.emit('response',mes);     
     }
    
   });
@@ -170,6 +165,12 @@ io.on('connection', (socket) => {
   });
   socket.on('disconnect', () => {
     console.log('user '+socket.id+' disconnected');
+  });
+  socket.on('displayLB', (msg) => {
+    var roomName = msg.name;
+    var tmp = {};
+    tmp["roomCapacity"] = Object.keys(roomArray[roomName]).length;
+    io.to(socket.id).emit('displayLB_response',tmp);
   });
 });
 
