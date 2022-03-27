@@ -1,8 +1,10 @@
 import {Laser,LaserGroup} from './entity/laser.js';
 import {Alien,AlienGroup,AlienLaserGroup} from './entity/alien.js';
-var timeLoad;
+var textfinish;
 var load;
+var nAlien=50;
 var score = 0;
+
 var scoreText;
 var ammo = 3;
 var ammoText;
@@ -10,6 +12,7 @@ var timeText;
 var timedEvent;
 var lastLaserTime = 0;
 var Leaderboard;
+var stopEffect=false;
 var startGame;
 var gameOverText;
 var load3=false;
@@ -49,6 +52,7 @@ var activeDescription;
 var lobby;
 var load1=false;
 var load2=false;
+var player = 1;
 var nickname;
 var roomName;
 var players;
@@ -67,6 +71,7 @@ function Game()
 	scene.start('GameScene');
 }
 function removeAlien(alien,laser){
+	nAlien= nAlien-1;
 	var explosion = this.sound.add('explosion');	
 	alien.disableBody(true,true);
 	laser.hit();
@@ -142,7 +147,7 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-
+		console.log(player);
 		timedEvent = this.time.delayedCall(100000);
 		//timedEvent = this.time.delayedCall(3000);
 		
@@ -151,7 +156,7 @@ class GameScene extends Phaser.Scene
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modeText = this.add.text(500, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
-		//classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		textfinish = this.add.text(150, 300, '', { fontSize: '50px', fill: '#FFFF' });
 		
 		pointText = this.add.text(874,260, '1 ', { fontSize: '20px', fill: 'black' });
 		
@@ -175,28 +180,29 @@ class GameScene extends Phaser.Scene
 		backBattle.setDepth(-1);
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
-		
-		if(players.value==1)
+		var leaderB=this.add.image(1000,400,'lB4');
+		leaderB.setDepth(-1);
+		/*
+		if(player==1)
 		{
-			console.log('messa');
 			var leaderB=this.add.image(1000,400,'lB1');
 		    leaderB.setDepth(-1);
 		}
-		if(players.value==2)
+		if(player==2)
 		{
 			var leaderB=this.add.image(1000,400,'lB2');
 		    leaderB.setDepth(-1);
 		}
-		if(players.value==3)
+		if(player==3)
 		{
 			var leaderB=this.add.image(1000,400,'lB3');
 		    leaderB.setDepth(-1);
 		}
-		if(players.value==4)
+		if(player==4)
 		{
 			var leaderB=this.add.image(1000,400,'lB4');
 		    leaderB.setDepth(-1);
-		}
+		}*/
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -225,20 +231,24 @@ class GameScene extends Phaser.Scene
 	reloadAmmo(event)
 	{
 		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
-			var ammoEffect = this.sound.add('ammo');	
-			ammoEffect.play();
-			ammo=3;
-			if(score >2)
+			if(stopEffect===false)
 			{
-				score = score-2;
-				scoreText.setText('Score: ' + score);
+				var ammoEffect = this.sound.add('ammo');	
+				ammoEffect.play();
+				ammo=3;
+				if(score >2)
+				{
+					score = score-2;
+					scoreText.setText('Score: ' + score);
+				}
+				else
+				{
+					score = 0;
+					scoreText.setText('Score: ' + score);
+				}
+				ammoText.setText('Ammo : ' + ammo);
 			}
-			else
-			{
-				score = 0;
-				scoreText.setText('Score: ' + score);
-			}
-			ammoText.setText('Ammo : ' + ammo);
+			
 		}
 	}
 	addEvents() {
@@ -251,28 +261,32 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.on('pointerdown', (pointer) => {
-			var time = timedEvent.getProgress().toString().substr(0, 5);
+			if(stopEffect===false)
+			{
+					var time = timedEvent.getProgress().toString().substr(0, 5);
+				
+				if(ammo>0)
+				{
+					if (time - lastLaserTime >0.005){
+						lastLaserTime = time;
+						ammo-=1;
+						ammoText.setText('Ammo : ' + ammo);
+						this.fireBullet();
+						this.bass.play();
+					}
+					else{
+						var shootDelay = this.sound.add('shootDelay');	
+						shootDelay.play();
+					}
+				}
+				if(ammo==0)
+				{
+					ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+					var outAmmoEffect = this.sound.add('outAmmo');	
+					outAmmoEffect.play();
+				}
+			}
 			
-			if(ammo>0)
-			{
-				if (time - lastLaserTime >0.005){
-					lastLaserTime = time;
-					ammo-=1;
-					ammoText.setText('Ammo : ' + ammo);
-					this.fireBullet();
-					this.bass.play();
-				}
-				else{
-					var shootDelay = this.sound.add('shootDelay');	
-					shootDelay.play();
-				}
-			}
-			if(ammo==0)
-			{
-				ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
-				var outAmmoEffect = this.sound.add('outAmmo');	
-				outAmmoEffect.play();
-			}
 			
 		});
 
@@ -325,7 +339,20 @@ class GameScene extends Phaser.Scene
 			score: score,
 			nameRoom: roomName.value
 		});
-
+		if(nAlien==0)
+		{
+			if(players.value==1)
+			{
+				startGame.stop();
+				this.scene.start('GameOver');
+			}
+			else
+			{
+				stopEffect=true;
+				textfinish.setText('Wait other players');
+			}
+			
+		}
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 		}
@@ -693,8 +720,10 @@ class HomeScene extends Phaser.Scene {
 						}
 						
 					});
+					
 					socket.on('players', function(data){
 						nPlayer=data;
+						player+=1;
 					});
 					
 					
@@ -760,7 +789,7 @@ class LoadScene extends Phaser.Scene {
 	update()
 	{
 		loadText.setText('Wait other players. Remaining player: '+nPlayer);
-			
+		
 		if(nPlayer === 0)
 		{
 			
@@ -806,6 +835,9 @@ class GameOver extends Phaser.Scene {
 		
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
+		var leaderB=this.add.image(1000,400,'lB4');
+		leaderB.setDepth(-1);
+		/*
 		if(players.value==1)
 		{
 			var leaderB=this.add.image(1000,400,'lB1');
@@ -825,7 +857,7 @@ class GameOver extends Phaser.Scene {
 		{
 			var leaderB=this.add.image(1000,400,'lB4');
 		    leaderB.setDepth(-1);
-		}
+		}*/
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
 		
