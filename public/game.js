@@ -115,6 +115,10 @@ class GameScene extends Phaser.Scene
 		this.load.image('first', './assets/first.png');
 		this.load.image('laserAlien', './assets/laserRed.png');
 		this.load.image('backBattle', './assets/backBattle.png');
+		this.load.image('lB1', './assets/lB1.png');
+		this.load.image('lB2', './assets/lB2.png');
+		this.load.image('lB3', './assets/lB3.png');
+		this.load.image('lB4', './assets/lB4.png');
 		this.load.image('backLeaderboard', './assets/leaderBoard.png');
 		this.load.image('ship', './assets/ship2.png');
 		this.load.spritesheet("alien","./assets/alien2.png",{frameWidth: 48,frameHeight: 32});
@@ -133,8 +137,8 @@ class GameScene extends Phaser.Scene
 		load.stop();
 		lobby.stop();
 		//socket = io();
-		var inputLeaderboard=this.add.image(990,150,'text');
-		var first=this.add.image(824,230,'first');
+		//var inputLeaderboard=this.add.image(990,150,'text');
+		//var first=this.add.image(824,230,'first');
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
@@ -147,9 +151,9 @@ class GameScene extends Phaser.Scene
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modeText = this.add.text(500, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
-		classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
-		classification.style.fontFamily='Common Pixel';
-		pointText = this.add.text(820,220, '1 ', { fontSize: '20px', fill: 'black' });
+		//classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		
+		pointText = this.add.text(874,260, '1 ', { fontSize: '20px', fill: 'black' });
 		
 		this.anims.create({
 			key: "animateAlien",
@@ -160,7 +164,7 @@ class GameScene extends Phaser.Scene
 		this.laserGroup = new LaserGroup(this);
 		this.alienGroup = new AlienGroup(this);
 		this.alienLaser = new AlienLaserGroup(this);
-
+		
 		this.addAliens();
 		this.addShip();
 		this.addEvents();
@@ -171,6 +175,28 @@ class GameScene extends Phaser.Scene
 		backBattle.setDepth(-1);
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
+		
+		if(players.value==1)
+		{
+			console.log('messa');
+			var leaderB=this.add.image(1000,400,'lB1');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==2)
+		{
+			var leaderB=this.add.image(1000,400,'lB2');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==3)
+		{
+			var leaderB=this.add.image(1000,400,'lB3');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==4)
+		{
+			var leaderB=this.add.image(1000,400,'lB4');
+		    leaderB.setDepth(-1);
+		}
 	}
 	addAliens(){
 		const centerX = this.cameras.main.width / 2;
@@ -275,8 +301,15 @@ class GameScene extends Phaser.Scene
 			{
 				var key = tuples[i][0];
 				var value = tuples[i][1];
+				if(i===0)
+				{
+					Leaderboard ='        '+key+'\t       '+value+"\n\n\n";
+				}
+				else
+				{
+					Leaderboard = Leaderboard+(i+1)+'      '+key+'\t       '+value+"\n\n\n";
+				}
 				
-				Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n\n";
 				
 				
 			}
@@ -750,8 +783,10 @@ class GameOver extends Phaser.Scene {
 	preload() {
 		this.load.audio('lose', [ './audio/lose.ogg', './audio/lose.mp3' ]);
 		this.load.audio('win', [ './audio/win.ogg', './audio/win.mp3' ]);
-		this.load.image('text', './assets/textLeaderboard.png');
-		this.load.image('first', './assets/first.png');
+		this.load.image('lB1', './assets/lB1.png');
+		this.load.image('lB2', './assets/lB2.png');
+		this.load.image('lB3', './assets/lB3.png');
+		this.load.image('lB4', './assets/lB4.png');
 		this.load.image('backLeaderboard', './assets/leaderBoard.png');
 		this.load.image('gameWin', './assets/win.png');
 		this.load.image('gameLose', './assets/lose.png');
@@ -762,14 +797,35 @@ class GameOver extends Phaser.Scene {
 		socket.emit('deleteRoom', {
 			nameRoom: roomName.value
 		});
-		finalPoints = this.add.text(820,220, '1  ', { fontSize: '20px', fill: 'black' });
+		
+		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
-		var inputLeaderboard=this.add.image(990,150,'text');
-		classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
-		var first=this.add.image(824,230,'first');
+		
+		//classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
+		
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
+		if(players.value==1)
+		{
+			var leaderB=this.add.image(1000,400,'lB1');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==2)
+		{
+			var leaderB=this.add.image(1000,400,'lB2');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==3)
+		{
+			var leaderB=this.add.image(1000,400,'lB3');
+		    leaderB.setDepth(-1);
+		}
+		if(players.value==4)
+		{
+			var leaderB=this.add.image(1000,400,'lB4');
+		    leaderB.setDepth(-1);
+		}
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
 		
@@ -792,7 +848,7 @@ class GameOver extends Phaser.Scene {
 
 		helloButton.on('pointerdown', function (pointer) {
 			Leaderboard='';
-			classification='';
+			//classification='';
 			lastLaserTime=0;
 			score=0;
 			ammo=3;
