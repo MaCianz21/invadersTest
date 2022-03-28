@@ -4,9 +4,10 @@ var textfinish;
 var load;
 var nAlien=50;
 var score = 0;
-
+var movement=0;
 var scoreText;
 var ammo = 3;
+var movementBack=0;
 var ammoText;
 var timeText;
 var timedEvent;
@@ -19,6 +20,7 @@ var load3=false;
 var modeText;
 var modalTextNickname;
 var modalTextRoom;
+var back=false;
 var backBattle;
 var mex;
 var tuples= [];
@@ -332,8 +334,47 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
+		console.log(movement);
+		if(back==false)
+		{
+			movement += 0.002;
+			if(movement>0.5)
+			{
+				back=true;
+				movement=0;
+			}
+		}
 		
 		
+		if(back==true)
+		{
+			movementBack -= 0.002;
+			if(movementBack <-0.5)
+			{
+				back=false;
+				movementBack=0;
+			}
+		}
+	
+		for(var i=0;i<50;i++)
+		{
+
+			
+			if(back==false)		
+			{
+				this.alienGroup.getChildren()[i].x +=movement;
+			}
+			if(back==true)		
+			{
+				this.alienGroup.getChildren()[i].x +=movementBack;
+			}
+					
+			
+			
+			
+		}
+		
+	
 		
 		socket.emit(socket.id, {
 			nickname: nickname.value,
