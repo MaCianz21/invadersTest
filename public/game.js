@@ -344,7 +344,9 @@ class GameScene extends Phaser.Scene
 					check = true;
 				}
 			}
-			console.log("colonna "+i+" viva");
+			if(check){
+				console.log("colonna "+i+" viva");
+			}
 		}
 		if(back==false)
 		{
