@@ -60,6 +60,8 @@ var roomName;
 var players;
 var formJoinChat;
 var playerNumber;
+var xLimitFront = 0.5;
+var xLimitBack = 0.5;
 
 function reloadGame()
 {
@@ -144,6 +146,9 @@ class GameScene extends Phaser.Scene
 	create() {
 		load.stop();
 		lobby.stop();
+		xLimitFront = 0.5;
+		xLimitBack = 0.5;
+
 		//socket = io();
 		//var inputLeaderboard=this.add.image(990,150,'text');
 		//var first=this.add.image(824,230,'first');
@@ -220,14 +225,12 @@ class GameScene extends Phaser.Scene
 			children[i].setPosition(x, y);
    		}
 	}
-
 	addShip() {
 		const centerX = this.cameras.main.width / 2;
 		const bottom = this.cameras.main.height;
 		this.ship = this.physics.add.sprite(centerX, bottom - 90, 'ship');
 		this.ship.setCollideWorldBounds(true);
 	}
-
 	reloadAmmo(event)
 	{
 		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
@@ -309,7 +312,7 @@ class GameScene extends Phaser.Scene
 						});
 
 					}
-		}
+			}
 		
 			for (var i = 0; i < tuples.length; i++) 
 			{
@@ -317,15 +320,12 @@ class GameScene extends Phaser.Scene
 				var value = tuples[i][1];
 				if(i===0)
 				{
-					Leaderboard ='        '+key+'\t       '+value+"\n\n\n";
+					Leaderboard ='         '+key+'\t       '+value+"\n\n\n";
 				}
 				else
 				{
-					Leaderboard = Leaderboard+(i+1)+'      '+key+'\t       '+value+"\n\n\n";
+					Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n\n\n";
 				}
-				
-				
-				
 			}
 			pointText.setText(Leaderboard);
 		});
@@ -334,32 +334,38 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-		
+
+		for(var i=0;i<10;i++)
+		{
+			//we think that the alien column is all dead
+			var check = false;
+			for(var j=0;j<5;j++){
+				if(this.alienGroup.getChildren()[i+(j*10)].visible){
+					check = true;
+				}
+			}
+			console.log("colonna "+i+" viva");
+		}
 		if(back==false)
 		{
 			movementX += 0.005;
-			if(movementX>0.5)
+			if(movementX > xLimitFront)
 			{
 				back=true;
 				movementX=0;
 			}
 		}
-		
-		
 		if(back==true)
 		{
 			movementBackX -= 0.005;
-			if(movementBackX <-0.5)
+			if(movementBackX <-xLimitBack)
 			{
 				back=false;
 				movementBackX=0;
 			}
 		}
-	
 		for(var i=0;i<50;i++)
 		{
-
-			
 			if(back==false)		
 			{
 				this.alienGroup.getChildren()[i].x +=movementX;
@@ -368,13 +374,7 @@ class GameScene extends Phaser.Scene
 			{
 				this.alienGroup.getChildren()[i].x +=movementBackX;
 			}
-					
-			
-			
-			
 		}
-		
-	
 		
 		socket.emit(socket.id, {
 			nickname: nickname.value,
