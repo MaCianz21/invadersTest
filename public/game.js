@@ -148,7 +148,6 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		console.log(player);
 		timedEvent = this.time.delayedCall(100000);
 		//timedEvent = this.time.delayedCall(3000);
 		
@@ -333,6 +332,9 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
+		
+		
+		
 		socket.emit(socket.id, {
 			nickname: nickname.value,
 			score: score,
@@ -340,7 +342,7 @@ class GameScene extends Phaser.Scene
 		});
 		if(nAlien==0)
 		{
-			if(players.value==1)
+			if(playerNumber==1)
 			{
 				startGame.stop();
 				this.scene.start('GameOver');
@@ -884,6 +886,7 @@ class GameOver extends Phaser.Scene {
 
 		helloButton.on('pointerdown', function (pointer) {
 			Leaderboard='';
+			nAlien=50;
 			lastLaserTime=0;
 			score=0;
 			ammo=3;
