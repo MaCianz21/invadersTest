@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
         io.to(socket.id).emit('nickname', 'not exist');
         
         roomArray[roomName][room.nickname] = 0;
-        
+        roomArray[roomName]["players"] = room.numberPlayer;
         player[roomName]=room.numberPlayer -1;
         socket.join(roomName);
         console.log('Room '+roomName+' created  '+numRoom );
@@ -75,7 +75,6 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit('checkRoom', 'exist');
       if(roomArray[roomName][room.nickname]!= undefined)
       {
-        
         io.to(socket.id).emit('nickname', 'exist');
       }
       else
@@ -86,6 +85,7 @@ io.on('connection', (socket) => {
         }
         else
         {
+          console.log(roomArray);
           io.to(socket.id).emit('checkPlayer', 'permit');
           socket.join(room.name);
           io.to(socket.id).emit('nickname', 'not exist');
@@ -97,7 +97,6 @@ io.on('connection', (socket) => {
           io.to(roomName).emit('players', tmp);
           
         }
-       
       }
     }
     else
@@ -133,7 +132,6 @@ io.on('connection', (socket) => {
     }
     else
     {
-      
       nickChat[nickname]=nickname;
       console.log('not exist');
       mes.nickname = nickChat[nickname];
@@ -144,12 +142,21 @@ io.on('connection', (socket) => {
     }
    
   });
-
+/*
   socket.on('deleteRoom', function(room) {
       console.log(roomArray);
       delete roomArray[room.nameRoom];
       console.log(roomArray);
       
+  });*/
+  socket.on('playerGameOver',function(data){
+
+    roomArray[data.nameRoom]["players"] = roomArray[data.nameRoom]["players"]-1;
+    if(roomArray[data.nameRoom]["players"] == 0){
+      console.log(roomArray);
+      delete roomArray[data.nameRoom];
+      console.log(roomArray);
+    }
   });
 
   socket.on(socket.id, (msg) => {
@@ -169,7 +176,7 @@ io.on('connection', (socket) => {
   socket.on('displayLB', (msg) => {
     var roomName = msg.name;
     var tmp = {};
-    tmp["roomCapacity"] = Object.keys(roomArray[roomName]).length;
+    tmp["roomCapacity"] = Object.keys(roomArray[roomName]).length-1;
     io.to(socket.id).emit('displayLB_response',tmp);
   });
 });

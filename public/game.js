@@ -300,13 +300,13 @@ class GameScene extends Phaser.Scene
 			var i = 1;
 		    Leaderboard = "";
 		    tuples = [];
+			delete data.players;
 			for(var key in data) {
 				if(data.hasOwnProperty(key)) {
 					tuples.push([key, data[key]]);
 					tuples.sort(function(a, b) {
 						a = a[1];
 						b = b[1];
-						
 						return a > b ? -1 : (a < b ? 1 : 0);
 					});
 				}
@@ -911,10 +911,10 @@ class GameOver extends Phaser.Scene {
 	}
     create ()
     {
-		socket.emit('deleteRoom', {
-			nameRoom: roomName.value
+		socket.emit('playerGameOver', {
+			nameRoom: roomName.value,
+			player: nickname.value
 		});
-		
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
