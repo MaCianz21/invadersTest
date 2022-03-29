@@ -320,13 +320,37 @@ class GameScene extends Phaser.Scene
 			{
 				var key = tuples[i][0];
 				var value = tuples[i][1];
+				//var tmp='';
+				switch(key.length)
+				{
+					case 1:
+						key=key+'      ';
+						break;
+					case 2:
+						key=key+'     ';
+						break;
+					case 3:
+						key=key+'    ';
+						break;
+					case 4:
+						key=key+'   ';
+						break;
+					case 5:
+						key=key+'  ';
+						break;
+					case 6:
+						key=key+' ';
+						break;
+					default:
+						console.log('Error switch key');
+				}
 				if(i===0)
 				{
-					Leaderboard ='         '+key+'\t       '+value+"\n\n\n";
+					Leaderboard ='    '+key+'\t     '+value+"\n\n\n";
 				}
 				else
 				{
-					Leaderboard = Leaderboard+(i+1)+'        '+key+'\t       '+value+"\n\n\n";
+					Leaderboard = Leaderboard+(i+1)+'   '+key+'\t     '+value+"\n\n\n";
 				}
 			}
 			pointText.setText(Leaderboard);
