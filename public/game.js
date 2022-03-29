@@ -32,6 +32,7 @@ var sendText;
 var finalPoints;
 var formChat;
 var Chat;
+var checkChat=false;
 var countDownText;
 var classification;
 var start= false;
@@ -372,23 +373,13 @@ class GameScene extends Phaser.Scene
 		if(back==true)
 		{
 			movementBackX -= 0.005;
-			if(extraX)
+			
+			if(movementBackX <-xLimitBack)
 			{
-				if(movementBackX <-xLimitBack-0.5)
-				{
-					back=false;
-					movementBackX=0;
-				}
-				
+				back=false;
+				movementBackX=0;
 			}
-			else
-			{
-				if(movementBackX <-xLimitBack)
-				{
-					back=false;
-					movementBackX=0;
-				}
-			}
+			
 		}
 		for(var i=0;i<50;i++)
 		{
@@ -547,6 +538,7 @@ class HomeScene extends Phaser.Scene {
 		image7.visible=false;
 		image8.visible=false;
 		
+		
 		socket.on('response', function(data){
 			if(data==='exist')
 			{
@@ -557,15 +549,17 @@ class HomeScene extends Phaser.Scene {
 				image1.visible=false;
 				image6.visible=false;
 				formJoinChat.style.display='none';
-				
+					
 				formChat.style.display = 'block';
 				image7.visible=true;
 				image8.visible=true;
+					
 				comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
-				
-
+					
 			}
 		});
+		
+		
 		
 		Chat.on('click', function (event) {
 			mex = this.getChildByName('usermsg');
@@ -585,6 +579,7 @@ class HomeScene extends Phaser.Scene {
 		
 		joinChat.on('click', function (event) {
 			if (event.target.name === 'viewChat'){
+				checkChat=true;
 				nickname = this.getChildByName('nickname');
 				if(formJoinChat.style.display === 'none'){
 					if(nickname.value === ''){
@@ -961,7 +956,7 @@ class GameOver extends Phaser.Scene {
 			load2=false;
 			load3=false;
             this.scene.start('HomeScene');
-
+			nickname='';
         }, this);
     	
         
