@@ -356,7 +356,7 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-
+		/*
 		for(var i=0;i<10;i++)
 		{
 			//we think that the alien column is all dead
@@ -377,7 +377,7 @@ class GameScene extends Phaser.Scene
 			else{
 				console.log("colonna "+i+" viva");
 			}
-		}
+		}*/
 		if(back==false)
 		{
 			movementX += 0.005;
