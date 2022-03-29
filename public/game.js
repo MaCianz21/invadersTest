@@ -17,6 +17,7 @@ var stopEffect=false;
 var startGame;
 var gameOverText;
 var load3=false;
+var extraX= false;
 var modeText;
 var modalTextNickname;
 var modalTextRoom;
@@ -340,30 +341,53 @@ class GameScene extends Phaser.Scene
 			//we think that the alien column is all dead
 			var check = false;
 			for(var j=0;j<5;j++){
-				if(this.alienGroup.getChildren()[i+(j*10)].visible){
+				if(this.alienGroup.getChildren()[i+(j*10)].visible == false){
 					check = true;
+				}
+				else
+				{
+					check=false;
 				}
 			}
 			if(check){
+				console.log("colonna "+i+" morta");
+				extraX=true;
+			}
+			else{
 				console.log("colonna "+i+" viva");
 			}
 		}
 		if(back==false)
 		{
 			movementX += 0.005;
+		
 			if(movementX > xLimitFront)
 			{
 				back=true;
 				movementX=0;
 			}
+			
+			
 		}
 		if(back==true)
 		{
 			movementBackX -= 0.005;
-			if(movementBackX <-xLimitBack)
+			if(extraX)
 			{
-				back=false;
-				movementBackX=0;
+				if(movementBackX <-xLimitBack-0.5)
+				{
+					back=false;
+					movementBackX=0;
+				}
+				
+			}
+			else
+			{
+				if(movementBackX <-xLimitBack)
+				{
+					back=false;
+					movementBackX=0;
+				}
 			}
 		}
 		for(var i=0;i<50;i++)
@@ -476,7 +500,7 @@ class HomeScene extends Phaser.Scene {
     {
 		socket = io();
 		modalTextRoom = this.add.text(200, 353, '', { fontSize: '14px', fill: 'white' });
-		modalTextNickname = this.add.text(200, 456, '', { fontSize: '14px', fill: 'white' });
+		modalTextNickname = this.add.text(200, 454, '', { fontSize: '14px', fill: 'white' });
 		modalTextRoom.setDepth(1);
 		modalTextNickname.setDepth(1);
         lobby = this.sound.add('lobby');
