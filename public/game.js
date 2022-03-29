@@ -262,7 +262,6 @@ class GameScene extends Phaser.Scene
 			{
 				this.ship.x = pointer.x;
 			}
-			
 		});
 
 		this.input.on('pointerdown', (pointer) => {
@@ -302,18 +301,15 @@ class GameScene extends Phaser.Scene
 		    Leaderboard = "";
 		    tuples = [];
 			for(var key in data) {
-				
-				
-					if(data.hasOwnProperty(key)) {
-						tuples.push([key, data[key]]);
-						tuples.sort(function(a, b) {
-							a = a[1];
-							b = b[1];
+				if(data.hasOwnProperty(key)) {
+					tuples.push([key, data[key]]);
+					tuples.sort(function(a, b) {
+						a = a[1];
+						b = b[1];
 						
-							return a > b ? -1 : (a < b ? 1 : 0);
-						});
-
-					}
+						return a > b ? -1 : (a < b ? 1 : 0);
+					});
+				}
 			}
 		
 			for (var i = 0; i < tuples.length; i++) 
