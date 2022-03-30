@@ -510,25 +510,25 @@ class HomeScene extends Phaser.Scene {
     create ()
     {
 		socket = io();
-		modalTextRoom = this.add.text(200, 353, '', { fontSize: '14px', fill: 'white' });
-		modalTextNickname = this.add.text(200, 454, '', { fontSize: '14px', fill: 'white' });
+		modalTextRoom = this.add.text(200, 373, '', { fontSize: '14px', fill: 'white' });
+		modalTextNickname = this.add.text(200, 474, '', { fontSize: '14px', fill: 'white' });
 		modalTextRoom.setDepth(1);
 		modalTextNickname.setDepth(1);
         lobby = this.sound.add('lobby');
 		lobby.play();	
 		var description = this.add.dom(320, 410).createFromCache('description');
 		this.add.image(550,350,'background');
-		this.add.image(200,150,'buttom');
-		this.add.image(450,150,'buttom');
-		this.add.image(320,87,'buttom');
-		image1=this.add.image(350,250,'input2');
-		image2=this.add.image(350,350,'input2');
-		image3=this.add.image(350,450,'input2');
-		image4=this.add.image(350,570,'buttom');
-		image5=this.add.image(350,470,'buttom');
-		image6=this.add.image(350,370,'buttom');
-		image8=this.add.image(330,400,'backChat');
-		image7=this.add.sprite(510,497,'send').setInteractive();
+		this.add.image(200,190,'buttom');
+		this.add.image(450,190,'buttom');
+		this.add.image(320,137,'buttom');
+		image1=this.add.image(350,270,'input2');
+		image2=this.add.image(350,370,'input2');
+		image3=this.add.image(350,470,'input2');
+		image4=this.add.image(350,590,'buttom');
+		image5=this.add.image(350,490,'buttom');
+		image6=this.add.image(350,390,'buttom');
+		image8=this.add.image(330,450,'backChat');
+		image7=this.add.sprite(510,550,'send').setInteractive();
 
         var createRoom = this.add.dom(400, 600).createFromCache('login');
 		createRoom.addListener('click');
