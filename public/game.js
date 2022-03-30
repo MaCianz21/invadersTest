@@ -492,7 +492,7 @@ class HomeScene extends Phaser.Scene {
     }
  
 	preload() {
-		this.load.image('background', './assets/background.jpg');
+		this.load.image('background', './assets/bkg2.jpg');
 		this.load.image('backChat', './assets/chat.png');
 		this.load.image('send', './assets/send.png');
 		
