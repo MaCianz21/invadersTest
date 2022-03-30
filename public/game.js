@@ -970,6 +970,7 @@ class GameOver extends Phaser.Scene {
 			Leaderboard='';
 			nAlien=50;
 			lastLaserTime=0;
+			stopEffect=false;
 			score=0;
 			ammo=3;
 			load1=false;
