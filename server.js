@@ -114,10 +114,15 @@ io.on('connection', (socket) => {
     mes.nickname = msg.nickname;
     mes.mex=msg.mex;
     mes.time=current;
-
-    io.emit('response',mes);
+    console.log(mes);
+    io.emit('chat_update',mes);
   });
 
+  socket.on('gameStart', (msg) => {
+    if(nickChat.hasOwnProperty(msg.nickname)){
+      delete nickChat[msg.nickname];
+    }
+  });
   
   socket.on('userJoin', (msg) => {
     var mes={};
@@ -125,10 +130,9 @@ io.on('connection', (socket) => {
     var nickname=msg.nickname;
     
     current = now.getHours() + ':' + now.getMinutes();
-    if(nickChat[nickname] != undefined)
-    {
+    if(nickChat[nickname] != undefined){
       console.log('exist');
-      io.sockets.emit('response','exist');
+      io.sockets.emit('chat_update','exist');
     }
     else
     {
@@ -138,9 +142,8 @@ io.on('connection', (socket) => {
      
       mes.mex=("joined the global chat");
       mes.time=current;
-      io.sockets.emit('response',mes);     
+      io.sockets.emit('chat_update',mes);
     }
-   
   });
 /*
   socket.on('deleteRoom', function(room) {
