@@ -4,7 +4,6 @@ var textfinish;
 var load;
 var nAlien=50;
 var score = 0;
-var movementX=0;
 var scoreText;
 var ammo = 3;
 var movementBackX=0;
@@ -21,7 +20,6 @@ var extraX= false;
 var modeText;
 var modalTextNickname;
 var modalTextRoom;
-var back=false;
 var backBattle;
 var mex;
 var tuples= [];
@@ -62,8 +60,12 @@ var roomName;
 var players;
 var formJoinChat;
 var playerNumber;
-var xLimitFront = 0.5;
-var xLimitBack = 0.5;
+
+var leftLimit = 50;
+var rightLimit = 750;
+//var speed = -0.005;
+var back=false;
+var movementX=0.5;
 
 function reloadGame()
 {
@@ -148,8 +150,6 @@ class GameScene extends Phaser.Scene
 	create() {
 		load.stop();
 		lobby.stop();
-		xLimitFront = 0.5;
-		xLimitBack = 0.5;
 
 		//var inputLeaderboard=this.add.image(990,150,'text');
 		//var first=this.add.image(824,230,'first');
@@ -355,8 +355,28 @@ class GameScene extends Phaser.Scene
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
 	update(time) {
-		
-		for(var i=0;i<10;i++)
+		var currentLeftLimit = 100;
+		var currentRightLimit = 750;
+		for(var i=0;i<5;i++)
+		{
+			//we think that the alien column is all dead
+			var check = true;
+			for(var j=0;j<5;j++){
+				if(this.alienGroup.getChildren()[i+(j*10)].visible){
+					//found an alive column
+					check = false;
+				}
+			}
+			if(!check){
+				currentLeftLimit = this.alienGroup.getChildren()[i*1].x;
+				break;
+				//console.log("colonna "+i+" viva");
+			}
+			else{
+				//console.log("colonna "+i+" morta");
+			}
+		}
+		for(var i=9;i>4;i--)
 		{
 			//we think that the alien column is all dead
 			var check = true;
@@ -365,45 +385,35 @@ class GameScene extends Phaser.Scene
 					check = false;
 				}
 			}
-
-			if(check){
-				console.log("colonna "+i+" morta");
+			if(!check){
+				currentRightLimit = this.alienGroup.getChildren()[i*1].x;
+				break;
+				//console.log("colonna "+i+" viva");
 			}
 			else{
-				console.log("colonna "+i+" viva");
+				//console.log("colonna "+i+" morta");
 			}
 		}
-		if(back==false)
-		{
-			movementX += 0.005;
 		
-			if(movementX > xLimitFront)
-			{
-				back=true;
-				movementX=0;
-			}
-		}
-		if(back==true)
+		console.log(currentLeftLimit+" - "+currentRightLimit);
+		//movement -> left
+		
+		if(currentLeftLimit <= leftLimit)
 		{
-			movementBackX -= 0.005;
-			
-			if(movementBackX <-xLimitBack)
-			{
-				back=false;
-				movementBackX=0;
-			}
-			
+				movementX = movementX*(-1);
 		}
+		
+		//movement -> right
+		
+		if(currentRightLimit >= rightLimit)
+		{
+				movementX = movementX*(-1);
+		}
+		
+		//render the movement
 		for(var i=0;i<50;i++)
 		{
-			if(back==false)		
-			{
-				this.alienGroup.getChildren()[i].x +=movementX;
-			}
-			if(back==true)		
-			{
-				this.alienGroup.getChildren()[i].x +=movementBackX;
-			}
+			this.alienGroup.getChildren()[i].x += movementX;
 		}
 		
 		socket.emit(socket.id, {
@@ -568,8 +578,6 @@ class HomeScene extends Phaser.Scene {
 					
 			}
 		});
-		
-		
 		
 		Chat.on('click', function (event) {
 			mex = this.getChildByName('usermsg');
