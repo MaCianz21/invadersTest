@@ -13,6 +13,7 @@ var timedEvent;
 var lastLaserTime = 0;
 var Leaderboard;
 var stopEffect=false;
+var tied = false;
 var startGame;
 var gameOverText;
 var load3=false;
@@ -940,8 +941,7 @@ class GameOver extends Phaser.Scene {
 
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
-		
-		if(tuples[0][0] == nickname.value)
+		if(playerNumber==1)
 		{
 			var gameWin=this.add.image(365,300,'gameWin');
 			gameOverText = this.add.text(295, 335, 'YOU WIN', { fontSize: '30px', fill: 'white' });
@@ -949,10 +949,49 @@ class GameOver extends Phaser.Scene {
 		}
 		else
 		{
+			if(tuples[0][0] == nickname.value && tuples[0][1]!= tuples[1][1])
+			{
+				var gameWin=this.add.image(365,300,'gameWin');
+				gameOverText = this.add.text(295, 335, 'YOU WIN', { fontSize: '30px', fill: 'white' });
+				win.play();
+			}
+			else
+			{
+				if(tuples[0][0] == nickname.value && tuples[0][1]== tuples[1][1])
+				{
+					var gameLose=this.add.image(365,440,'gameLose');
+					gameOverText = this.add.text(295, 335, 'YOU TIED', { fontSize: '30px', fill: 'white' });
+					lose.play();
+				}
+				else
+				{
+					for(var i=1;i<tuples.length;i++)
+					{
+						if(tuples[i][0]==nickname.value && tuples[i][1]== tuples[0][1])
+						{
+							var gameLose=this.add.image(365,440,'gameLose');
+							gameOverText = this.add.text(295, 335, 'YOU TIED', { fontSize: '30px', fill: 'white' });
+							lose.play();
+							tied=true;
+						}
+					}
+					if(tied==false)
+					{
+						var gameLose=this.add.image(365,440,'gameLose');
+						gameOverText = this.add.text(295, 335, 'YOU LOSE', { fontSize: '30px', fill: 'white' });
+						lose.play();
+					}
+				}
+			}
+		}
+		
+		/*
+		else
+		{
 			var gameLose=this.add.image(365,440,'gameLose');
 			gameOverText = this.add.text(295, 335, 'YOU LOSE', { fontSize: '30px', fill: 'white' });
 			lose.play();
-		}
+		}*/
 		//gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
        
 		const helloButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
