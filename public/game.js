@@ -164,7 +164,7 @@ class GameScene extends Phaser.Scene
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
 		modeText = this.add.text(500, 16, 'Mode: Easy', { fontSize: '30px', fill: '#FFFF' });
-		textfinish = this.add.text(150, 300, '', { fontSize: '50px', fill: '#FFFF' });
+		textfinish = this.add.text(80, 300, '', { fontSize: '40px', fill: '#FFFF' });
 		
 		pointText = this.add.text(874,260, '1 ', { fontSize: '20px', fill: 'black' });
 		
@@ -431,7 +431,7 @@ class GameScene extends Phaser.Scene
 			else
 			{
 				stopEffect=true;
-				textfinish.setText('Wait other players');
+				textfinish.setText('Wait for the end of the game');
 			}
 			
 		}
