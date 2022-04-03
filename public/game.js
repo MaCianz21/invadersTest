@@ -61,7 +61,7 @@ var roomName;
 var players;
 var formJoinChat;
 var playerNumber;
-
+var gameEnd = false;
 var leftLimit = 50;
 var rightLimit = 750;
 //var speed = -0.005;
@@ -141,7 +141,6 @@ class GameScene extends Phaser.Scene
 		this.load.audio('explosion', [ './audio/explosion.ogg', './audio/explosion.mp3' ]);
 		this.load.audio('ammo', [ './audio/ammo.ogg', './audio/ammo.mp3' ]);
 		this.load.audio('outAmmo', [ './audio/outAmmo.ogg', './audio/outAmmo.mp3' ]);
-		//this.load.audio('gameOver', [ './audio/gameOver.ogg', './audio/gameOver.mp3' ]);
 		this.load.audio('startGame', [ './audio/game.ogg', './audio/game.mp3' ]);
 		this.load.audio('kill', [ './audio/kill.ogg', './audio/kill.mp3' ]);
 		this.load.audio('shootDelay', [ './audio/Click1.wav' ]);
@@ -149,6 +148,7 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
+
 		load.stop();
 		lobby.stop();
 
@@ -157,9 +157,8 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		timedEvent = this.time.delayedCall(100000);
-		//timedEvent = this.time.delayedCall(3000);
-		
+		//timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -189,6 +188,15 @@ class GameScene extends Phaser.Scene
 		backBattle.setDepth(-1);
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
+
+		gameEnd = false;
+		socket.on("roomFinish",function(tmp){
+			if(tmp){
+				startGame.stop();
+				gameEnd = true;
+			}
+		});
+
 		switch(playerNumber){
 			case 1:
 				var leaderB=this.add.image(1000,400,'lB1');
@@ -316,7 +324,7 @@ class GameScene extends Phaser.Scene
 			{
 				var key = tuples[i][0];
 				var value = tuples[i][1];
-				//var tmp='';
+
 				switch(key.length)
 				{
 					case 1:
@@ -358,7 +366,7 @@ class GameScene extends Phaser.Scene
 	update(time) {
 		var currentLeftLimit = 100;
 		var currentRightLimit = 750;
-		for(var i=0;i<5;i++)
+		for(var i=0;i<10;i++)
 		{
 			//we think that the alien column is all dead
 			var check = true;
@@ -371,13 +379,9 @@ class GameScene extends Phaser.Scene
 			if(!check){
 				currentLeftLimit = this.alienGroup.getChildren()[i*1].x;
 				break;
-				//console.log("colonna "+i+" viva");
-			}
-			else{
-				//console.log("colonna "+i+" morta");
 			}
 		}
-		for(var i=9;i>4;i--)
+		for(var i=9;i>(-1);i--)
 		{
 			//we think that the alien column is all dead
 			var check = true;
@@ -389,26 +393,22 @@ class GameScene extends Phaser.Scene
 			if(!check){
 				currentRightLimit = this.alienGroup.getChildren()[i*1].x;
 				break;
-				//console.log("colonna "+i+" viva");
-			}
-			else{
-				//console.log("colonna "+i+" morta");
 			}
 		}
 		
-		console.log(currentLeftLimit+" - "+currentRightLimit);
+		//console.log(currentLeftLimit+" - "+currentRightLimit);
 		//movement -> left
 		
 		if(currentLeftLimit <= leftLimit)
 		{
-				movementX = movementX*(-1);
+			movementX = movementX*(-1);
 		}
 		
 		//movement -> right
 		
 		if(currentRightLimit >= rightLimit)
 		{
-				movementX = movementX*(-1);
+			movementX = movementX*(-1);
 		}
 		
 		//render the movement
@@ -422,30 +422,46 @@ class GameScene extends Phaser.Scene
 			score: score,
 			nameRoom: roomName.value
 		});
+		
 		if(nAlien==0)
 		{
 			if(playerNumber==1)
 			{
+				socket.emit('playerFinish',{
+					roomName: roomName.value,
+					nickname: nickname.value
+				});
+				stopEffect=true;
 				startGame.stop();
-				this.scene.start('GameOver');
 			}
 			else
 			{
 				stopEffect=true;
 				textfinish.setText('Wait for the end of the game');
 			}
-			
 		}
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 		}
-		if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
-			if(timedEvent.getProgress().toString().substr(0, 4)==0.60)
-		    {
-				startGame.stop();
-				this.scene.start('GameOver');
-		    }
+
+		console.log("End: "+gameEnd);
+		if(gameEnd){
+			this.scene.start('GameOver');
 		}
+
+		if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
+			socket.emit('playerFinish',{
+				roomName: roomName.value,
+				nickname: nickname.value
+			});
+			stopEffect=true;
+			startGame.stop();
+		}
+		else{
+			stopEffect=true;
+			textfinish.setText('Wait for the end of the game');
+		}
+
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;
 			if(Math.round(time/100)%15 == 0){
@@ -456,7 +472,6 @@ class GameScene extends Phaser.Scene
 				{
 					this.alienLaser.fireBullet(alienShoot.x,alienShoot.y);
 				}
-				
 			}
 		}
 
@@ -705,7 +720,7 @@ class HomeScene extends Phaser.Scene {
 					});
 
 					socket.on('players', function(data){
-						nPlayer=data;
+						nPlayer=data
 					});
 					
 					
@@ -829,10 +844,12 @@ class HomeScene extends Phaser.Scene {
     }
 	update()
 	{
-		
 		if(load1===true && load2===true && load3===true){
-			socket.emit("gameStart",{
+			/*socket.emit("gameStart",{
 				nickname: nickname.value
+			});*/
+			socket.emit("gameStart",{
+				name: roomName.value
 			});
 			this.scene.start('LoadScene');
 		}
@@ -860,6 +877,9 @@ class LoadScene extends Phaser.Scene {
 		loadText = this.add.text(16, 16, 'Wait other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
 		countDownText = this.add.text(400, 300, '', { fontSize: '120px', fill: '#FFFF' });
 			
+		socket.on('displayLB_response', function(data){
+			playerNumber = data.roomCapacity;
+		});
     }
 	update()
 	{
@@ -871,9 +891,6 @@ class LoadScene extends Phaser.Scene {
 				name: roomName.value
 			});
 			
-			socket.on('displayLB_response', function(data){
-				playerNumber = data.roomCapacity;
-			});
 
 			countDownText.setText('GO!');
 			this.scene.start('GameScene');
@@ -904,15 +921,13 @@ class GameOver extends Phaser.Scene {
     create ()
     {
 		socket.removeAllListeners("chat_update");
-		socket.emit('playerGameOver', {
+		/*socket.emit('playerGameOver', {
 			nameRoom: roomName.value,
 			player: nickname.value
-		});
+		});*/
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
-		
-		//classification = this.add.text(900, 130, 'Leaderboard', { fontSize: '27px', fill: '#FFFF' });
 		
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
@@ -967,7 +982,7 @@ class GameOver extends Phaser.Scene {
 				{
 					for(var i=1;i<tuples.length;i++)
 					{
-						if(tuples[i][0]==nickname.value && tuples[i][1]== tuples[0][1])
+						if(tuples[i][0]==nickname.value && tuples[i][1] == tuples[0][1])
 						{
 							var gameLose=this.add.image(365,440,'gameLose');
 							gameOverText = this.add.text(295, 335, 'YOU TIED', { fontSize: '30px', fill: 'white' });
@@ -985,19 +1000,10 @@ class GameOver extends Phaser.Scene {
 			}
 		}
 		
-		/*
-		else
-		{
-			var gameLose=this.add.image(365,440,'gameLose');
-			gameOverText = this.add.text(295, 335, 'YOU LOSE', { fontSize: '30px', fill: 'white' });
-			lose.play();
-		}*/
-		//gameOverText = this.add.text(200, 300, 'GAME OVER', { fontSize: '80px', fill: '#FF0000' });
-       
-		const helloButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
-    	helloButton.setInteractive();
+		const homePageButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
+    	homePageButton.setInteractive();
 
-		helloButton.on('pointerdown', function (pointer) {
+		homePageButton.on('pointerdown', function (pointer) {
 			Leaderboard='';
 			nAlien=50;
 			lastLaserTime=0;

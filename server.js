@@ -8,26 +8,18 @@ var player={};
 var nickChat={};
 app.use(express.static(__dirname + '/public'));
 var id;
-var roomArray={};
-var numRoom=0;
+var roomArray={};//memorize the scores of the players in the different rooms
 var now;
 var current;
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
-
-
-
 io.on('connection', (socket) => {
-  console.log('user '+socket.id+' connected');
+	console.log('user '+socket.id+' connected');
 
   socket.on('createRoom', function(room) {
-    
     var roomName = room.name;
-
-    //console.log(roomArray[roomName]);
-    
     if(roomArray[roomName]!= undefined)
     {
       io.to(socket.id).emit('checkRoom', 'exist');
@@ -37,38 +29,33 @@ io.on('connection', (socket) => {
     {
       io.to(socket.id).emit('checkRoom', 'not exist');
       roomArray[roomName] = {};
+      player[roomName] = {};
       if(roomArray[roomName][room.nickname]!= undefined)
       {
         io.to(socket.id).emit('nickname', 'exist');
-        
       }
       else
       {
         io.to(socket.id).emit('nickname', 'not exist');
         
         roomArray[roomName][room.nickname] = 0;
-        roomArray[roomName]["players"] = room.numberPlayer;
-        player[roomName]=room.numberPlayer -1;
-        socket.join(roomName);
-        console.log('Room '+roomName+' created  '+numRoom );
         
-        var tmp = player[roomName];
+        player[roomName][room.nickname] = 0;
+        player[roomName].players = room.numberPlayer -1;
+
+        socket.join(roomName);
+        console.log('Room '+roomName+' created ='+player[roomName].players);
+        
+        var tmp = player[roomName].players;
         io.to(socket.id).emit('players', tmp);
       }
     }
-    
-    
-    
-    
-    
-    
   });
 
   socket.on('joinRoom', function(room) {
     
     var roomName = room.name;
 
-    
     if(roomArray[roomName]!= undefined)
     {
       console.log('room exist');
@@ -79,7 +66,8 @@ io.on('connection', (socket) => {
       }
       else
       {
-        if(player[roomName] ===0)
+        console.log(player[roomName]);
+        if(player[roomName].players === 0)
         {
           io.to(socket.id).emit('checkPlayer', 'prohibited');
         }
@@ -90,10 +78,13 @@ io.on('connection', (socket) => {
           socket.join(room.name);
           io.to(socket.id).emit('nickname', 'not exist');
           roomArray[roomName][room.nickname] = 0;
-          player[roomName] = player[roomName]-1;
-          console.log('Player '+room.nickname+' has joined in the  '+room.name );
-          console.log( roomArray[roomName]);
-          var tmp = player[roomName];
+          player[roomName].players = player[roomName].players -1;
+          
+          player[roomName][room.nickname] = 0;
+
+          console.log('Player '+room.nickname+' has joined in '+room.name );
+          var tmp = player[roomName].players;
+          console.log(tmp);
           io.to(roomName).emit('players', tmp);
           
         }
@@ -118,10 +109,9 @@ io.on('connection', (socket) => {
     io.emit('chat_update',mes);
   });
 
-  socket.on('gameStart', (msg) => {
-    if(nickChat.hasOwnProperty(msg.nickname)){
-      delete nickChat[msg.nickname];
-    }
+  socket.on('gameStart', (data) => {
+    var roomName = data.name;
+    player[roomName].players = Object.keys(roomArray[roomName]).length;
   });
   
   socket.on('userJoin', (msg) => {
@@ -145,13 +135,7 @@ io.on('connection', (socket) => {
       io.sockets.emit('chat_update',mes);
     }
   });
-/*
-  socket.on('deleteRoom', function(room) {
-      console.log(roomArray);
-      delete roomArray[room.nameRoom];
-      console.log(roomArray);
-      
-  });*/
+  /*
   socket.on('playerGameOver',function(data){
 
     roomArray[data.nameRoom]["players"] = roomArray[data.nameRoom]["players"]-1;
@@ -160,7 +144,7 @@ io.on('connection', (socket) => {
       delete roomArray[data.nameRoom];
       console.log(roomArray);
     }
-  });
+  });*/
 
   socket.on(socket.id, (msg) => {
 
@@ -173,14 +157,33 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit('message',tmp);
     
   });
-  socket.on('disconnect', () => {
-    console.log('user '+socket.id+' disconnected');
-  });
   socket.on('displayLB', (msg) => {
+    console.log(roomArray);
     var roomName = msg.name;
     var tmp = {};
-    tmp["roomCapacity"] = Object.keys(roomArray[roomName]).length-1;
+    tmp["roomCapacity"] = Object.keys(roomArray[roomName]).length;
     io.to(socket.id).emit('displayLB_response',tmp);
+  });
+
+  socket.on('playerFinish', (data) => {
+    var roomName = data.roomName;
+    var nickname = data.nickname;
+
+    var tmp = false;
+
+    if(player[roomName].hasOwnProperty(nickname)){
+      delete player[roomName][nickname];
+    }
+    
+    if(Object.keys(player[roomName]).length == 1){
+      tmp = true;
+      console.log("player count "+player[roomName]);
+      io.to(roomName).emit('roomFinish', tmp);
+    }
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('user '+socket.id+' disconnected');
   });
 });
 
