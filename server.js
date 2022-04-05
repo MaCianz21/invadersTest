@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
-    console.log("room");
+    console.log(playerSocketID[socket.id]);
     for(room in player){
       console.log(room);
       if(room.hasOwnProperty(playerSocketID[socket.id])){
