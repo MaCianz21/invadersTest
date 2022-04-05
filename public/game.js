@@ -157,8 +157,8 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		timedEvent = this.time.delayedCall(100000);
-		//timedEvent = this.time.delayedCall(3000);
+		//timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -437,7 +437,6 @@ class GameScene extends Phaser.Scene
 					stopEffect=true;
 					startGame.stop();
 				}
-				
 				else
 				{
 					stopEffect=true;
@@ -459,18 +458,10 @@ class GameScene extends Phaser.Scene
 			});
 			stopEffect=true;
 			startGame.stop();
-			if(nPlayer>1)
-			{
-				textfinish.setText('Wait for the end of the game');
-			}
+			textfinish.setText('Wait for the end of the game');			}
 			
 			backBattle.tilePositionY -= 3;
 		}
-		/*
-		else{
-			stopEffect=true;
-			textfinish.setText('Wait for the end of the game');
-		}*/
 
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;
@@ -588,7 +579,7 @@ class HomeScene extends Phaser.Scene {
 		
 		socket.on('chat_update', function(data){
 			console.log(data);
-			if(data==='exist'){
+			if(data === 'exist'){
 				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
 			}
 			else{
@@ -935,10 +926,6 @@ class GameOver extends Phaser.Scene {
     create ()
     {
 		socket.removeAllListeners("chat_update");
-		socket.emit('playerGameOver', {
-			nameRoom: roomName.value,
-			player: nickname.value
-		});
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');
@@ -1018,6 +1005,11 @@ class GameOver extends Phaser.Scene {
     	homePageButton.setInteractive();
 
 		homePageButton.on('pointerdown', function (pointer) {
+			
+			socket.emit('playerGameOver', {
+				nameRoom: roomName.value,
+				player: nickname.value
+			});
 			Leaderboard='';
 			nAlien=50;
 			lastLaserTime=0;
@@ -1029,6 +1021,7 @@ class GameOver extends Phaser.Scene {
 			load3=false;
             this.scene.start('HomeScene');
 			nickname='';
+
         }, this);
     }
 }
