@@ -157,8 +157,8 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(100000);
+		//timedEvent = this.time.delayedCall(3000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -459,7 +459,11 @@ class GameScene extends Phaser.Scene
 			});
 			stopEffect=true;
 			startGame.stop();
-			textfinish.setText('Wait for the end of the game');
+			if(nPlayer>1)
+			{
+				textfinish.setText('Wait for the end of the game');
+			}
+			
 			backBattle.tilePositionY -= 3;
 		}
 		/*
