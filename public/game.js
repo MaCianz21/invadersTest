@@ -926,10 +926,10 @@ class GameOver extends Phaser.Scene {
     create ()
     {
 		socket.removeAllListeners("chat_update");
-		/*socket.emit('playerGameOver', {
+		socket.emit('playerGameOver', {
 			nameRoom: roomName.value,
 			player: nickname.value
-		});*/
+		});
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
 		this.add.image(600,600,'buttom');

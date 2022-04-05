@@ -137,15 +137,11 @@ io.on('connection', (socket) => {
       io.sockets.emit('chat_update',mes);
     }
   });
-  /*
+  
   socket.on('playerGameOver',function(data){
-    roomArray[data.nameRoom]["players"] = roomArray[data.nameRoom]["players"]-1;
-    if(roomArray[data.nameRoom]["players"] == 0){
-      console.log(roomArray);
       delete roomArray[data.nameRoom];
-      console.log(roomArray);
-    }
-  });*/
+      delete player[data.nameRoom];
+  });
 
   socket.on(socket.id, (msg) => {
 
