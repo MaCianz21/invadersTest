@@ -423,25 +423,27 @@ class GameScene extends Phaser.Scene
 			nameRoom: roomName.value
 		});
 		
-		if(nAlien==0)
-		{
-			if(playerNumber==1)
-			{
-				socket.emit('playerFinish',{
-					roomName: roomName.value,
-					nickname: nickname.value
-				});
-				stopEffect=true;
-				startGame.stop();
-			}
-			else
-			{
-				stopEffect=true;
-				textfinish.setText('Wait for the end of the game');
-			}
-		}
+		
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
+			if(nAlien==0)
+			{
+				if(playerNumber==1)
+				{
+					socket.emit('playerFinish',{
+						roomName: roomName.value,
+						nickname: nickname.value
+					});
+					stopEffect=true;
+					startGame.stop();
+				}
+				
+				else
+				{
+					stopEffect=true;
+					textfinish.setText('Wait for the end of the game');
+				}
+			}
 		}
 
 		console.log("End: "+gameEnd);
@@ -449,18 +451,21 @@ class GameScene extends Phaser.Scene
 			this.scene.start('GameOver');
 		}
 
-		if(timedEvent.getProgress().toString().substr(0, 4)==0.60){
+		if(timedEvent.getProgress().toString().substr(0, 4)>=0.60){
 			socket.emit('playerFinish',{
 				roomName: roomName.value,
 				nickname: nickname.value
 			});
 			stopEffect=true;
 			startGame.stop();
+			textfinish.setText('Wait for the end of the game');
+			backBattle.tilePositionY -= 3;
 		}
+		/*
 		else{
 			stopEffect=true;
 			textfinish.setText('Wait for the end of the game');
-		}
+		}*/
 
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;

@@ -47,6 +47,7 @@ io.on('connection', (socket) => {
         console.log('Room '+roomName+' created ='+player[roomName].players);
         
         var tmp = player[roomName].players;
+        console.log('lalala'+tmp);
         io.to(socket.id).emit('players', tmp);
       }
     }
@@ -78,13 +79,14 @@ io.on('connection', (socket) => {
           socket.join(room.name);
           io.to(socket.id).emit('nickname', 'not exist');
           roomArray[roomName][room.nickname] = 0;
-          player[roomName].players = player[roomName].players -1;
+          console.log('lalalal '+player[roomName].players);
+          player[roomName].players -= 1;
           
           player[roomName][room.nickname] = 0;
 
           console.log('Player '+room.nickname+' has joined in '+room.name );
           var tmp = player[roomName].players;
-          console.log(tmp);
+          
           io.to(roomName).emit('players', tmp);
           
         }
@@ -111,7 +113,7 @@ io.on('connection', (socket) => {
 
   socket.on('gameStart', (data) => {
     var roomName = data.name;
-    player[roomName].players = Object.keys(roomArray[roomName]).length;
+    //player[roomName].players = Object.keys(roomArray[roomName]).length;
   });
   
   socket.on('userJoin', (msg) => {
@@ -137,7 +139,6 @@ io.on('connection', (socket) => {
   });
   /*
   socket.on('playerGameOver',function(data){
-
     roomArray[data.nameRoom]["players"] = roomArray[data.nameRoom]["players"]-1;
     if(roomArray[data.nameRoom]["players"] == 0){
       console.log(roomArray);
