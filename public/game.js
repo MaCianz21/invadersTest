@@ -452,13 +452,16 @@ class GameScene extends Phaser.Scene
 
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.60){
 			timeText.setText('Time:  1.00');
+			if(playerNumber!=1){
+				stopEffect=true;
+				startGame.stop();
+				textfinish.setText('Wait for the end of the game');
+			}
+			
 			socket.emit('playerFinish',{
 				roomName: roomName.value,
 				nickname: nickname.value
 			});
-			stopEffect=true;
-			startGame.stop();
-			textfinish.setText('Wait for the end of the game');			}
 			
 			backBattle.tilePositionY -= 3;
 		}
@@ -1007,8 +1010,8 @@ class GameOver extends Phaser.Scene {
 		homePageButton.on('pointerdown', function (pointer) {
 			
 			socket.emit('playerGameOver', {
-				nameRoom: roomName.value,
-				player: nickname.value
+				nameRoom: roomName.value
+				//player: nickname.value
 			});
 			Leaderboard='';
 			nAlien=50;

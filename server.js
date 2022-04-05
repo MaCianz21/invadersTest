@@ -7,11 +7,13 @@ const io = new Server(server);
 var player={};
 var nickChat={};
 app.use(express.static(__dirname + '/public'));
-var id;
 var roomArray={};//memorize the scores of the players in the different rooms
 var now;
 var current;
 var playerDelete={};
+var playerSocketID={};
+
+
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -44,6 +46,8 @@ io.on('connection', (socket) => {
         
         player[roomName][room.nickname] = 0;
         player[roomName].players = room.numberPlayer -1;
+
+        playerSocketID[socket.id] = room.nickname;
 
         socket.join(roomName);
         console.log('Room '+roomName+' created ='+player[roomName].players);
@@ -81,8 +85,8 @@ io.on('connection', (socket) => {
           socket.join(room.name);
           io.to(socket.id).emit('nickname', 'not exist');
           roomArray[roomName][room.nickname] = 0;
-          console.log('lalalal '+player[roomName].players);
           player[roomName].players -= 1;
+          playerSocketID[socket.id] = room.nickname;
           
           player[roomName][room.nickname] = 0;
 
@@ -141,8 +145,12 @@ io.on('connection', (socket) => {
   });
   
   socket.on('playerGameOver',function(data){
-      delete roomArray[data.nameRoom];
-      delete player[data.nameRoom];
+      if(player.hasOwnProperty(data.nameRoom)){
+        delete player[data.nameRoom];
+      }
+      if(roomArray.hasOwnProperty(data.nameRoom)){
+        delete roomArray[data.nameRoom];
+      }
   });
 
   socket.on(socket.id, (msg) => {
@@ -165,6 +173,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('playerFinish', (data) => {
+    console.log(data);
     var roomName = data.roomName;
     var nickname = data.nickname;
 
@@ -182,7 +191,16 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
-    
+    console.log("room");
+    for(room in player){
+      console.log(room);
+      if(room.hasOwnProperty(playerSocketID[socket.id])){
+        delete room[playerSocketID[socket.id]];
+      }
+    }
+    console.log(player);
+
+    playerSocketID[socket.id]
     for(var key in playerDelete)
     {
         if(key == socket.id)
