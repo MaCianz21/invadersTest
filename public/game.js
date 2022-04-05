@@ -157,8 +157,8 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		timedEvent = this.time.delayedCall(100000);
-		//timedEvent = this.time.delayedCall(3000);
+		//timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -452,6 +452,7 @@ class GameScene extends Phaser.Scene
 		}
 
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.60){
+			timeText.setText('Time:  1.00');
 			socket.emit('playerFinish',{
 				roomName: roomName.value,
 				nickname: nickname.value
@@ -587,15 +588,19 @@ class HomeScene extends Phaser.Scene {
 				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
 			}
 			else{
-				image1.visible=false;
-				image6.visible=false;
-				formJoinChat.style.display='none';
+				if(nickname.value != '')
+				{
+					image1.visible=false;
+					image6.visible=false;
+					formJoinChat.style.display='none';
+						
+					formChat.style.display = 'block';
+					image7.visible=true;
+					image8.visible=true;
 					
-				formChat.style.display = 'block';
-				image7.visible=true;
-				image8.visible=true;
+					comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
+				}
 				
-				comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
 					
 			}
 		});
