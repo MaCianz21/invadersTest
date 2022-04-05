@@ -11,6 +11,7 @@ var id;
 var roomArray={};//memorize the scores of the players in the different rooms
 var now;
 var current;
+var playerDelete={};
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -37,7 +38,8 @@ io.on('connection', (socket) => {
       else
       {
         io.to(socket.id).emit('nickname', 'not exist');
-        
+       
+       
         roomArray[roomName][room.nickname] = 0;
         
         player[roomName][room.nickname] = 0;
@@ -120,7 +122,7 @@ io.on('connection', (socket) => {
     var mes={};
     now = new Date();
     var nickname=msg.nickname;
-    
+    playerDelete[socket.id]=nickname;
     current = now.getHours() + ':' + now.getMinutes();
     if(nickChat[nickname] != undefined){
       console.log('exist');
@@ -180,6 +182,14 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
+    
+    for(var key in playerDelete)
+    {
+        if(key == socket.id)
+        {
+          delete nickChat[playerDelete[key]];
+        }
+    }
     console.log('user '+socket.id+' disconnected');
   });
 });
