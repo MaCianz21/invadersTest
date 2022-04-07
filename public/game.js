@@ -66,6 +66,8 @@ var rightLimit = 750;
 
 var back=false;
 var movementX=0.5;
+var speedUpAlienI;
+var speedUpAlienH;
 
 function reloadGame()
 {
@@ -164,6 +166,8 @@ class GameScene extends Phaser.Scene
 		
 		pointText = this.add.text(874,260, '1 ', { fontSize: '20px', fill: 'black' });
 		
+		speedUpAlienI = true;
+		speedUpAlienH = true;
 		this.anims.create({
 			key: "animateAlien",
 			frames: this.anims.generateFrameNumbers("alien"),
@@ -479,6 +483,10 @@ class GameScene extends Phaser.Scene
 			backBattle.tilePositionY -= 2;
 			if(Math.round(time/100)%10 == 0){
 				modeText.setText('Mode: Indermediate');
+				if(speedUpAlienI){
+					speedUpAlienI = false;
+					movementX = movementX*2;
+				}
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
 				if(alienShoot.visible === true)
@@ -492,6 +500,10 @@ class GameScene extends Phaser.Scene
 			backBattle.tilePositionY -= 3;
 			if(Math.round(time/100)%5 == 0){
 				modeText.setText('Mode: Hard');
+				if(speedUpAlienH){
+					speedUpAlienH = false;
+					movementX = movementX*2;
+				}
 				var random = Phaser.Math.Between(0, 49);
 				var alienShoot = this.alienGroup.getChildren()[random];
 				if(alienShoot.visible === true)
