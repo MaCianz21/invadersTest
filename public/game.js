@@ -249,7 +249,7 @@ class GameScene extends Phaser.Scene
 				var ammoEffect = this.sound.add('ammo');	
 				ammoEffect.play();
 				ammo=3;
-				if(score >2)
+				if(score >2 && ammo <3)
 				{
 					score = score-2;
 					scoreText.setText('Score: ' + score);
