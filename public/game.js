@@ -594,7 +594,7 @@ class HomeScene extends Phaser.Scene {
 				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
 			}
 			else{
-				if(nickname.value != '')
+				if(checkChat===true)
 				{
 					image1.visible=false;
 					image6.visible=false;
@@ -604,10 +604,10 @@ class HomeScene extends Phaser.Scene {
 					image7.visible=true;
 					image8.visible=true;
 					
-					comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
+					
 				}
 				
-					
+				comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
 			}
 		});
 		
@@ -628,7 +628,7 @@ class HomeScene extends Phaser.Scene {
 		
 		joinChat.on('click', function (event) {
 			if (event.target.name === 'viewChat'){
-				checkChat=true;
+				
 				nickname = this.getChildByName('nickname');
 				if(formJoinChat.style.display === 'none'){
 					if(nickname.value === ''){
@@ -668,7 +668,7 @@ class HomeScene extends Phaser.Scene {
 			}
 			
 			if (event.target.name === 'joinChatRoom'){
-				
+				checkChat=true;
 				//joining the global chat
 				nickname = this.getChildByName('nickname');
 				if(nickname.value===''){
@@ -685,6 +685,7 @@ class HomeScene extends Phaser.Scene {
 
         createRoom.on('click', function (event) {
 			if (event.target.name === 'createRoom'){
+				
 			    roomName = this.getChildByName('roomName');
 			    nickname = this.getChildByName('nickname');
 			    players = this.getChildByName('players');
@@ -743,6 +744,7 @@ class HomeScene extends Phaser.Scene {
 			}
 			
 			if (event.target.name === 'viewRoom'){
+				checkChat=false;
 				if(formCreateRoom.style.display === 'none'){
 					formJoinRoom.style.display='none';
 					formCreateRoom.style.display='block';
@@ -835,6 +837,7 @@ class HomeScene extends Phaser.Scene {
 			
 			if (event.target.name === 'viewJoin')
 			{
+				checkChat=false;
 				if(formJoinRoom.style.display === 'none')
 				{
 					formCreateRoom.style.display='none';
