@@ -1034,8 +1034,10 @@ class GameOver extends Phaser.Scene {
 			load1=false;
 			load2=false;
 			load3=false;
-            this.scene.start('HomeScene');
 			nickname='';
+			movementX=0.5;
+            this.scene.start('HomeScene');
+			
 
         }, this);
     }
