@@ -119,6 +119,8 @@ io.on('connection', (socket) => {
 
   socket.on('gameStart', (data) => {
     var roomName = data.name;
+    console.log("SOckets");
+    console.log(playerSocketID);
     //player[roomName].players = Object.keys(roomArray[roomName]).length;
   });
   
@@ -185,22 +187,26 @@ io.on('connection', (socket) => {
     
     if(Object.keys(player[roomName]).length == 1){
       tmp = true;
-      console.log("player count "+player[roomName]);
       io.to(roomName).emit('roomFinish', tmp);
     }
   });
   
   socket.on('disconnect', () => {
-    console.log(playerSocketID[socket.id]);
+    //deletes from the player array the user that disconnected
     for(room in player){
-      console.log(room);
-      if(room.hasOwnProperty(playerSocketID[socket.id])){
-        delete room[playerSocketID[socket.id]];
+      if(player[room].hasOwnProperty(playerSocketID[socket.id])){
+         delete player[room][playerSocketID[socket.id]];
+      }
+      if(Object.keys(player[room]).length == 1){
+        if(player.hasOwnProperty(room)){
+          delete player[room];
+        }
+        if(roomArray.hasOwnProperty(room)){
+          delete roomArray[room];
+        }
       }
     }
-    console.log(player);
 
-    playerSocketID[socket.id]
     for(var key in playerDelete)
     {
         if(key == socket.id)

@@ -55,7 +55,6 @@ var activeDescription;
 var lobby;
 var load1=false;
 var load2=false;
-var player = 1;
 var nickname;
 var roomName;
 var players;
@@ -64,7 +63,7 @@ var playerNumber;
 var gameEnd = false;
 var leftLimit = 50;
 var rightLimit = 750;
-//var speed = -0.005;
+
 var back=false;
 var movementX=0.5;
 
@@ -152,13 +151,10 @@ class GameScene extends Phaser.Scene
 		load.stop();
 		lobby.stop();
 
-		//var inputLeaderboard=this.add.image(990,150,'text');
-		//var first=this.add.image(824,230,'first');
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(100000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -563,8 +559,8 @@ class HomeScene extends Phaser.Scene {
 	    Chat = this.add.dom(400, 600).createFromCache('chat');
 		Chat.addListener('click');
 		
-		formCreateRoom = createRoom.getChildByName('createRoom');
-		formJoinRoom = joinRoom.getChildByName('joinRoom');
+		formCreateRoom = createRoom.getChildByName('createRoomForm');
+		formJoinRoom = joinRoom.getChildByName('joinRoomForm');
 		formJoinChat = joinChat.getChildByName('createNickname');
 		formChat = Chat.getChildByName('chat');
 		comment = Chat.getChildByName('comment');
@@ -605,7 +601,6 @@ class HomeScene extends Phaser.Scene {
 		
 		Chat.on('click', function (event) {
 			mex = this.getChildByName('usermsg');
-			//comment = this.getChildByName('comment');
 			image7.on('pointerdown', function (pointer) {
 				if(mex.value !='')
 				{
@@ -819,7 +814,7 @@ class HomeScene extends Phaser.Scene {
 					
 					socket.on('players', function(data){
 						nPlayer=data;
-						player+=1;
+						//player+=1;
 					});
 					
 					
@@ -899,7 +894,6 @@ class LoadScene extends Phaser.Scene {
 				name: roomName.value
 			});
 			
-
 			countDownText.setText('GO!');
 			this.scene.start('GameScene');
 		}
@@ -928,6 +922,10 @@ class GameOver extends Phaser.Scene {
 	}
     create ()
     {
+		socket.emit('playerGameOver', {
+			nameRoom: roomName.value
+		});
+
 		socket.removeAllListeners("chat_update");
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
@@ -1008,11 +1006,6 @@ class GameOver extends Phaser.Scene {
     	homePageButton.setInteractive();
 
 		homePageButton.on('pointerdown', function (pointer) {
-			
-			socket.emit('playerGameOver', {
-				nameRoom: roomName.value
-				//player: nickname.value
-			});
 			Leaderboard='';
 			nAlien=50;
 			lastLaserTime=0;
@@ -1043,12 +1036,12 @@ const config = {
 			enableBody: true
 		}
 	},
-  scale: {
-    parent: 'container',
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1200,
-    height: 700
-  } ,
+	scale: {
+		parent: 'container',
+		autoCenter: Phaser.Scale.CENTER_BOTH,
+		width: 1200,
+		height: 700
+	} ,
 	scene: [HomeScene,LoadScene,GameScene,GameOver]
 };
 
