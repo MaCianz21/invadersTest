@@ -152,7 +152,6 @@ class GameScene extends Phaser.Scene
 
 		load.stop();
 		lobby.stop();
-
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
