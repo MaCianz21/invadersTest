@@ -69,18 +69,6 @@ var movementX=0.5;
 var speedUpAlienI;
 var speedUpAlienH;
 
-function reloadGame()
-{
-	this.start('HomeScene');
-}
-function sendMessage()
-{
-	console.log('ciao');
-}
-function Game()
-{
-	scene.start('GameScene');
-}
 function removeAlien(alien,laser){
 	nAlien= nAlien-1;
 	var explosion = this.sound.add('explosion');	
@@ -155,7 +143,7 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		timedEvent = this.time.delayedCall(100000);
+		timedEvent = this.time.delayedCall(3000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
@@ -214,7 +202,6 @@ class GameScene extends Phaser.Scene
 				leaderB.setDepth(-1);
 				break;
 			default:
-				console.log("error");
 				break;
 		}
 	}
@@ -350,7 +337,7 @@ class GameScene extends Phaser.Scene
 						key=key+' ';
 						break;
 					default:
-						console.log('Error switch key');
+						break;
 				}
 				if(i===0)
 				{
@@ -400,16 +387,13 @@ class GameScene extends Phaser.Scene
 			}
 		}
 		
-		//console.log(currentLeftLimit+" - "+currentRightLimit);
 		//movement -> left
-		
 		if(currentLeftLimit <= leftLimit)
 		{
 			movementX = movementX*(-1);
 		}
 		
 		//movement -> right
-		
 		if(currentRightLimit >= rightLimit)
 		{
 			movementX = movementX*(-1);
@@ -449,7 +433,6 @@ class GameScene extends Phaser.Scene
 			}
 		}
 
-		console.log("End: "+gameEnd);
 		if(gameEnd){
 			this.scene.start('GameOver');
 		}
@@ -593,7 +576,6 @@ class HomeScene extends Phaser.Scene {
 		comment.value="";
 		
 		socket.on('chat_update', function(data){
-			console.log(data);
 			if(data === 'exist'){
 				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
 			}
@@ -710,7 +692,6 @@ class HomeScene extends Phaser.Scene {
 					});
 					
 					socket.on('nickname', function(data){
-						console.log(data);
 						if(data==='exist')
 						{
 							modalTextNickname.setText('Nickname '+nickname.value+' already exist');
@@ -724,7 +705,6 @@ class HomeScene extends Phaser.Scene {
 						
 					});
 					socket.on('checkRoom', function(data){
-						console.log(data);
 						if(data==='exist')
 						{
 							modalTextRoom.setText('Room '+roomName.value+' already exist');
@@ -791,7 +771,6 @@ class HomeScene extends Phaser.Scene {
 					});
 					
 					socket.on('nickname', function(data){
-						console.log(data);
 						if(data==='exist')
 						{
 							modalTextNickname.setText('Nickname '+nickname.value+' already exist');
@@ -804,7 +783,6 @@ class HomeScene extends Phaser.Scene {
 						
 					});
 					socket.on('checkRoom', function(data){
-						console.log(data);
 						if(data==='exist')
 						{
 							load2=true;
@@ -816,7 +794,6 @@ class HomeScene extends Phaser.Scene {
 						
 					});
 					socket.on('checkPlayer', function(data){
-						console.log(data);
 						if(data!='prohibited')
 						{
 							load3=true;
@@ -971,7 +948,6 @@ class GameOver extends Phaser.Scene {
 				leaderB.setDepth(-1);
 				break;
 			default:
-				console.log("error");
 				break;
 		}
 
