@@ -143,7 +143,7 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(10000);
 
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
