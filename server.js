@@ -119,9 +119,6 @@ io.on('connection', (socket) => {
 
   socket.on('gameStart', (data) => {
     var roomName = data.name;
-    console.log("SOckets");
-    console.log(playerSocketID);
-    //player[roomName].players = Object.keys(roomArray[roomName]).length;
   });
   
   socket.on('userJoin', (msg) => {
@@ -131,13 +128,11 @@ io.on('connection', (socket) => {
     playerDelete[socket.id]=nickname;
     current = now.getHours() + ':' + now.getMinutes();
     if(nickChat[nickname] != undefined){
-      console.log('exist');
       io.sockets.emit('chat_update','exist');
     }
     else
     {
       nickChat[nickname]=nickname;
-      console.log('not exist');
       mes.nickname = nickChat[nickname];
      
       mes.mex=("joined the global chat");
