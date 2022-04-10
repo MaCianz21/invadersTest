@@ -788,6 +788,7 @@ class LoadScene extends Phaser.Scene {
 		}
 	}
 }
+//scene that contains the game over scene
 class GameOver extends Phaser.Scene {
 
     constructor ()
