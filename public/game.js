@@ -799,10 +799,6 @@ class GameOver extends Phaser.Scene {
 		this.load.image('buttom', './assets/buttom.png');
 	}
     create (){
-		socket.emit('playerGameOver', {
-			nameRoom: roomName.value
-		});
-
 		socket.removeAllListeners("chat_update");
 		finalPoints = this.add.text(874,260, '', { fontSize: '20px', fill: 'black' });
 		finalPoints.setText(Leaderboard);
@@ -868,6 +864,9 @@ class GameOver extends Phaser.Scene {
 		const homePageButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
     	homePageButton.setInteractive();
 		homePageButton.on('pointerdown', function (pointer) {
+			socket.emit('playerGameOver', {
+				nameRoom: roomName.value
+			});
 			Leaderboard='';
 			nAlien=50;
 			lastLaserTime=0;
