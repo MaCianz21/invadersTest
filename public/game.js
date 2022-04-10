@@ -837,7 +837,7 @@ class GameOver extends Phaser.Scene {
 		}
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
-		//play a different sound according to the player's ranking
+		//play a different sound and displays game over text according to the player's ranking
 		if(playerNumber==1){
 			var gameWin=this.add.image(365,300,'gameWin');
 			gameOverText = this.add.text(295, 335, 'YOU WIN', { fontSize: '30px', fill: 'white' });
