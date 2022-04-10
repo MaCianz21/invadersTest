@@ -4,14 +4,14 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-var player={};
-var nickChat={};
+var player={};//contains the players and the rooms
+var nickChat={};//contains the nicknames used in the global chat
 app.use(express.static(__dirname + '/public'));
 var roomArray={};//memorize the scores of the players in the different rooms
 var now;
 var current;
-var playerDelete={};
-var playerSocketID={};
+var playerDelete={};//assign socket id to the nickname used in the global chat
+var playerSocketID={};//assign socket id to the nickname used in the game room
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');

@@ -57,6 +57,7 @@ var movementX=0.5;
 var speedUpAlienI;
 var speedUpAlienH;
 
+//handler for the collision between alien and projectiles(user)
 function removeAlien(alien,laser){
 	nAlien= nAlien-1;
 	var explosion = this.sound.add('explosion');	
@@ -67,6 +68,7 @@ function removeAlien(alien,laser){
 	scoreText.setText('Score: ' + score);
 }
 
+//handler for the collision between ship and projectiles(alien)
 function shipHit(ship,laser){
 	var kill = this.sound.add('kill');
 	laser.destroy();
@@ -82,7 +84,7 @@ function shipHit(ship,laser){
 		scoreText.setText('Score: ' + score);
 	}
 }
-
+//scene that contains the game logic
 class GameScene extends Phaser.Scene
 {
 	constructor() {
@@ -123,8 +125,7 @@ class GameScene extends Phaser.Scene
 		this.bass = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
-		//timedEvent = this.time.delayedCall(100000);
-		timedEvent = this.time.delayedCall(3000);
+		timedEvent = this.time.delayedCall(100000);
 		scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '30px', fill: '#FFFF' });
 		ammoText = this.add.text(16, 46, 'Ammo : 3', { fontSize: '30px', fill: '#FFFF' });
 		timeText = this.add.text(16, 76, 'Time : 0.00', { fontSize: '30px', fill: '#FFFF' });
@@ -152,6 +153,7 @@ class GameScene extends Phaser.Scene
 		var backLeaderboard = this.add.tileSprite(1050,500, 500, 800, "backLeaderboard");
 		backLeaderboard.setDepth(-1);
 		gameEnd = false;
+		//handler for game end
 		socket.on("roomFinish",function(tmp){
 			if(tmp){
 				startGame.stop();
@@ -222,12 +224,13 @@ class GameScene extends Phaser.Scene
 		}
 	}
 	addEvents() {
+		//handler for the movement of the ship
 		this.input.on('pointermove', (pointer) => {
 			if(pointer.x >=80 && pointer.x<=705){
 				this.ship.x = pointer.x;
 			}
 		});
-
+		//handler for the shoot of the projectile
 		this.input.on('pointerdown', (pointer) => {
 			if(stopEffect===false){
 					var time = timedEvent.getProgress().toString().substr(0, 5);
@@ -256,7 +259,7 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
-		
+		//handler for the leaderboard update
 		socket.on('message', function(data){
 			var i = 1;
 		    Leaderboard = "";
@@ -314,23 +317,23 @@ class GameScene extends Phaser.Scene
 	update(time) {
 		var currentLeftLimit = 100;
 		var currentRightLimit = 750;
+		//calulating the first column of aliens that are alive from the left
 		for(var i=0;i<10;i++){
-			//we think that the alien column is all dead
 			var check = true;
 			for(var j=0;j<5;j++){
 				if(this.alienGroup.getChildren()[i+(j*10)].visible){
-					//found an alive column
 					check = false;
 				}
 			}
 			if(!check){
+				//the i-column contains aliens, memorize the position of the alien that is alive
 				currentLeftLimit = this.alienGroup.getChildren()[i*1].x;
 				break;
 			}
 		}
 
+		//calulating the first column of aliens that are alive from the right
 		for(var i=9;i>(-1);i--){
-			//we think that the alien column is all dead
 			var check = true;
 			for(var j=0;j<5;j++){
 				if(this.alienGroup.getChildren()[i+(j*10)].visible){
@@ -338,6 +341,7 @@ class GameScene extends Phaser.Scene
 				}
 			}
 			if(!check){
+				//the i-column contains aliens, memorize the position of the alien that is alive
 				currentRightLimit = this.alienGroup.getChildren()[i*1].x;
 				break;
 			}
@@ -357,13 +361,17 @@ class GameScene extends Phaser.Scene
 		for(var i=0;i<50;i++){
 			this.alienGroup.getChildren()[i].x += movementX;
 		}
-		
+		//emits the score of the player
 		socket.emit(socket.id, {
 			nickname: nickname.value,
 			score: score,
 			nameRoom: roomName.value
 		});
-
+		//change scene if the gameEnd(that is set by a handler) is true
+		if(gameEnd){
+			this.scene.start('GameOver');
+		}
+		//checks if the player has finished the game before the time limit, and if the other players are still playing
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.60){
 			timeText.setText('Time: ' + timedEvent.getProgress().toString().substr(0, 4));
 			if(nAlien==0){
@@ -381,11 +389,7 @@ class GameScene extends Phaser.Scene
 				}
 			}
 		}
-
-		if(gameEnd){
-			this.scene.start('GameOver');
-		}
-
+		//checks if the time has reached the limit, and if the other players are still playing
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.60){
 			timeText.setText('Time:  1.00');
 			if(playerNumber!=1){
@@ -401,7 +405,7 @@ class GameScene extends Phaser.Scene
 			
 			backBattle.tilePositionY -= 3;
 		}
-
+		//checks the time and changes game parameters like movement speed of the aliens(Easy mode)
 		if(timedEvent.getProgress().toString().substr(0, 4)<0.20){
 			backBattle.tilePositionY -= 1;
 			if(Math.round(time/100)%15 == 0){
@@ -412,7 +416,7 @@ class GameScene extends Phaser.Scene
 				}
 			}
 		}
-
+		//checks the time and changes game parameters like movement speed of the aliens(Indermediate mode)
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.20 && timedEvent.getProgress().toString().substr(0, 4)<0.40){
 			backBattle.tilePositionY -= 2;
 			if(Math.round(time/100)%10 == 0){
@@ -428,6 +432,7 @@ class GameScene extends Phaser.Scene
 				}
 			}
 		}
+		//checks the time and changes game parameters like movement speed of the aliens(hard mode)
 		if(timedEvent.getProgress().toString().substr(0, 4)>=0.40 && timedEvent.getProgress().toString().substr(0, 4)<=0.60)
 		{
 			backBattle.tilePositionY -= 3;
@@ -447,6 +452,7 @@ class GameScene extends Phaser.Scene
 		
 	}
 }
+//scene that contains the home page GUI
 class HomeScene extends Phaser.Scene {
 
     constructor ()
@@ -509,6 +515,7 @@ class HomeScene extends Phaser.Scene {
 		image7.visible=false;
 		image8.visible=false;
 		comment.value="";
+		//handler for the global chat messages
 		socket.on('chat_update', function(data){
 			if(data === 'exist'){
 				modalTextRoom.setText('Nickname '+nickname.value+' already exist');
@@ -526,7 +533,7 @@ class HomeScene extends Phaser.Scene {
 				comment.value += '['+data.nickname+']'+ data.mex +'        '+data.time+'\n';
 			}
 		});
-		
+		//handler for the click the button that sends a message
 		Chat.on('click', function (event) {
 			mex = this.getChildByName('usermsg');
 			image7.on('pointerdown', function (pointer) {
@@ -540,7 +547,7 @@ class HomeScene extends Phaser.Scene {
 			});
 			
 		});
-		
+		//handler for the button for joining the chat
 		joinChat.on('click', function (event) {
 			if (event.target.name === 'viewChat'){
 				nickname = this.getChildByName('nickname');
@@ -594,7 +601,7 @@ class HomeScene extends Phaser.Scene {
 				}	
 			}
 		});
-
+		//handler for the button for the creation of a room
         createRoom.on('click', function (event) {
 			if (event.target.name === 'createRoom'){
 			    roomName = this.getChildByName('roomName');
@@ -663,7 +670,7 @@ class HomeScene extends Phaser.Scene {
 				}
 			}
 		});
-		
+		//handler for the button for joining a room
 		joinRoom.on('click', function (event) {
 			if (event.target.name === 'joinRoom'){
 			    roomName = this.getChildByName('roomName');
@@ -743,6 +750,7 @@ class HomeScene extends Phaser.Scene {
 		}
 	}
 }
+//scene that contains the loading scene
 class LoadScene extends Phaser.Scene {
 
     constructor ()
@@ -769,6 +777,7 @@ class LoadScene extends Phaser.Scene {
     }
 	update()
 	{
+		//update of the nPlayer value for the remaining players needed to start the game
 		loadText.setText('Wait other players. Remaining player: '+nPlayer);
 		if(nPlayer === 0){
 			socket.emit('displayLB',{
@@ -827,6 +836,7 @@ class GameOver extends Phaser.Scene {
 		}
         var lose = this.sound.add('lose');
 		var win = this.sound.add('win');	
+		//play a different sound according to the player's ranking
 		if(playerNumber==1){
 			var gameWin=this.add.image(365,300,'gameWin');
 			gameOverText = this.add.text(295, 335, 'YOU WIN', { fontSize: '30px', fill: 'white' });
@@ -861,6 +871,7 @@ class GameOver extends Phaser.Scene {
 				}
 			}
 		}
+		//creates a button to return to the home page, and resets all the game variables
 		const homePageButton = this.add.text(527, 638, 'Return homePage', { fill: 'lightblue' });
     	homePageButton.setInteractive();
 		homePageButton.on('pointerdown', function (pointer) {
