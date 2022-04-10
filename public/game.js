@@ -744,7 +744,8 @@ class HomeScene extends Phaser.Scene {
 	update(){
 		if(load1===true && load2===true && load3===true){
 			socket.emit("gameStart",{
-				name: roomName.value
+				name: roomName.value,
+				socket: socket.id
 			});
 			this.scene.start('LoadScene');
 		}

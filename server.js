@@ -10,7 +10,7 @@ app.use(express.static(__dirname + '/public'));
 var roomArray={};//memorize the scores of the players in the different rooms
 var now;
 var current;
-var playerDelete={};//assign socket id to the nickname used in the global chat
+var chatDelete={};//assign socket id to the nickname used in the global chat
 var playerSocketID={};//assign socket id to the nickname used in the game room
 
 app.get('/', function (req, res) {
@@ -84,13 +84,20 @@ io.on('connection', (socket) => {
 
   socket.on('gameStart', (data) => {
     var roomName = data.name;
+    
+    for(var key in chatDelete){
+      if(key == data.socket){
+        delete nickChat[chatDelete[key]];
+      }
+    }
+    
   });
   
   socket.on('userJoin', (msg) => {
     var mes={};
     now = new Date();
     var nickname=msg.nickname;
-    playerDelete[socket.id]=nickname;
+    chatDelete[socket.id]=nickname;
     current = now.getHours() + ':' + now.getMinutes();
     if(nickChat[nickname] != undefined){
       io.sockets.emit('chat_update','exist');
@@ -110,7 +117,7 @@ io.on('connection', (socket) => {
         delete player[data.nameRoom];
       }
       if(roomArray.hasOwnProperty(data.nameRoom)){
-        delete roomArray[data.nameRoom];
+        delete nickChat[data.nameRoom];
       }
   });
 
@@ -158,9 +165,9 @@ io.on('connection', (socket) => {
       }
     }
 
-    for(var key in playerDelete){
+    for(var key in chatDelete){
         if(key == socket.id){
-          delete nickChat[playerDelete[key]];
+          delete nickChat[chatDelete[key]];
         }
     }
   });
