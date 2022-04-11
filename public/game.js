@@ -624,7 +624,7 @@ class HomeScene extends Phaser.Scene {
 					
 					socket.on('nickname', function(data){
 						if(data==='exist'){
-							modalTextNickname.setText('Nickname '+nickname.value+' already exist');
+							modalTextNickname.setText('Nickname '+nickname.value+' already exists');
 						}
 						else{
 							load1=true;
@@ -632,9 +632,9 @@ class HomeScene extends Phaser.Scene {
 						}
 					});
 
-					socket.on('checkRoom', function(data){
+					socket.on('checkRoom_create', function(data){
 						if(data==='exist'){
-							modalTextRoom.setText('Room '+roomName.value+' already exist');
+							modalTextRoom.setText('Room '+roomName.value+' already exists');
 						}
 						else{
 							load2=true;
@@ -689,19 +689,19 @@ class HomeScene extends Phaser.Scene {
 					
 					socket.on('nickname', function(data){
 						if(data==='exist'){
-							modalTextNickname.setText('Nickname '+nickname.value+' already exist');	
+							modalTextNickname.setText('Nickname '+nickname.value+' already exists');	
 						}
 						else{
 							load1=true;
 						}
 					});
 
-					socket.on('checkRoom', function(data){
+					socket.on('checkRoom_join', function(data){
 						if(data==='exist'){
 							load2=true;
 						}
 						else{
-							modalTextRoom.setText('Room '+roomName.value+' not exist');
+							modalTextRoom.setText('Room '+roomName.value+' does not exist');
 						}
 					});
 
@@ -710,7 +710,7 @@ class HomeScene extends Phaser.Scene {
 							load3=true;
 						}
 						else{
-							modalTextRoom.setText('Number of players reached');
+							modalTextRoom.setText('Max number of players reached');
 						}
 					});
 
@@ -770,7 +770,7 @@ class LoadScene extends Phaser.Scene {
 		lobby.stop();
 		load.play();	
 		this.add.image(400,350,'back');
-		loadText = this.add.text(16, 16, 'Wait other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
+		loadText = this.add.text(16, 16, 'Wait for the other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
 		countDownText = this.add.text(400, 300, '', { fontSize: '120px', fill: '#FFFF' });
 		socket.on('displayLB_response', function(data){
 			playerNumber = data.roomCapacity;
@@ -779,7 +779,7 @@ class LoadScene extends Phaser.Scene {
 	update()
 	{
 		//update of the nPlayer value for the remaining players needed to start the game
-		loadText.setText('Wait other players. Remaining player: '+nPlayer);
+		loadText.setText('Wait for the other players. Remaining player: '+nPlayer);
 		if(nPlayer === 0){
 			socket.emit('displayLB',{
 				name: roomName.value

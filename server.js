@@ -21,10 +21,10 @@ io.on('connection', (socket) => {
   socket.on('createRoom', function(room) {
     var roomName = room.name;
     if(roomArray[roomName]!= undefined){
-      io.to(socket.id).emit('checkRoom', 'exist');
+      io.to(socket.id).emit('checkRoom_create', 'exist');
     }
     else{
-      io.to(socket.id).emit('checkRoom', 'not exist');
+      io.to(socket.id).emit('checkRoom_create', 'not exist');
       roomArray[roomName] = {};
       player[roomName] = {};
       if(roomArray[roomName][room.nickname]!= undefined){
@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', function(room) {   
     var roomName = room.name;
     if(roomArray[roomName]!= undefined){
-      io.to(socket.id).emit('checkRoom', 'exist');
+      io.to(socket.id).emit('checkRoom_join', 'exist');
       if(roomArray[roomName][room.nickname]!= undefined){
         io.to(socket.id).emit('nickname', 'exist');
       }
@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
       }
     }
     else{
-      io.to(socket.id).emit('checkRoom', 'not exist');
+      io.to(socket.id).emit('checkRoom_join', 'not exist');
     }
   });
 
@@ -118,6 +118,7 @@ io.on('connection', (socket) => {
       }
       if(roomArray.hasOwnProperty(data.nameRoom)){
         delete nickChat[data.nameRoom];
+        delete roomArray[data.nameRoom];
       }
   });
 
