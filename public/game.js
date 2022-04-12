@@ -205,7 +205,6 @@ class GameScene extends Phaser.Scene
 		this.ship.setCollideWorldBounds(true);
 	}
 	reloadAmmo(event){
-		//if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
 		if(stopEffect===false){
 			var ammoEffect = this.sound.add('ammo');	
 			ammoEffect.play();
@@ -222,8 +221,6 @@ class GameScene extends Phaser.Scene
 			ammo=3;
 			ammoText.setText('Ammo : ' + ammo);
 		}
-			
-		//}
 	}
 	addEvents() {
 		//handler for the movement of the ship
