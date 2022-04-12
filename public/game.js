@@ -205,25 +205,25 @@ class GameScene extends Phaser.Scene
 		this.ship.setCollideWorldBounds(true);
 	}
 	reloadAmmo(event){
-		if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
-			if(stopEffect===false){
-				var ammoEffect = this.sound.add('ammo');	
-				ammoEffect.play();
-				if(score >2 ){
-					if(ammo<3){
-						score = score-2;
-					    scoreText.setText('Score: ' + score);
-					}
+		//if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.R) {
+		if(stopEffect===false){
+			var ammoEffect = this.sound.add('ammo');	
+			ammoEffect.play();
+			if(score >2 ){
+				if(ammo<3){
+					score = score-2;
+				    scoreText.setText('Score: ' + score);
 				}
-				else{
-					score = 0;
-					scoreText.setText('Score: ' + score);
-				}
-				ammo=3;
-				ammoText.setText('Ammo : ' + ammo);
 			}
-			
+			else{
+				score = 0;
+				scoreText.setText('Score: ' + score);
+			}
+			ammo=3;
+			ammoText.setText('Ammo : ' + ammo);
 		}
+			
+		//}
 	}
 	addEvents() {
 		//handler for the movement of the ship
@@ -253,7 +253,7 @@ class GameScene extends Phaser.Scene
 					}
 				}
 				if(ammo==0){
-					ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+					ammoText.setText('Ammo : ' + ammo+ '[reload mandatory!]');
 					var outAmmoEffect = this.sound.add('outAmmo');	
 					outAmmoEffect.play();
 				}
@@ -324,14 +324,19 @@ class GameScene extends Phaser.Scene
 		var currentRightLimit = 750;
 
 		if(cursors.right.isDown){
-			if(this.ship.x <= 705)
-			this.ship.x += 2.5;
+			if(this.ship.x <= 705){
+				this.ship.x += 2.5;
+			}
 		}
 		if(cursors.left.isDown){
-			if(this.ship.x >= 80)
-			this.ship.x -= 2.5;
+			if(this.ship.x >= 80){
+				this.ship.x -= 2.5;
+			}
 		}
 		
+		if(cursors.down.isDown){
+			this.reloadAmmo();
+		}
 		if (cursors.up.isDown){
 			if(stopEffect===false){
 				var timerShot = timedEvent.getProgress().toString().substr(0, 5);
@@ -349,7 +354,7 @@ class GameScene extends Phaser.Scene
 					}
 				}
 				if(ammo==0){
-					ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+					ammoText.setText('Ammo : ' + ammo+ '[reload mandatory!]');
 					var outAmmoEffect = this.sound.add('outAmmo');	
 					outAmmoEffect.play();
 				}
