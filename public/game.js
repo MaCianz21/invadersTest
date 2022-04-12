@@ -313,6 +313,7 @@ class GameScene extends Phaser.Scene
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
+	
 	update(time) {
 		var currentLeftLimit = 100;
 		var currentRightLimit = 750;
