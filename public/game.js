@@ -7,6 +7,7 @@ var gameOverText;
 var score = 0;
 var scoreText;
 var ammo = 3;
+var cursors;
 var ammoText;
 var timeText;
 var timedEvent;
@@ -120,6 +121,7 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
+		cursors = this.input.keyboard.createCursorKeys();
 		load.stop();
 		lobby.stop();
 		this.bass = this.sound.add('bass');
@@ -230,6 +232,8 @@ class GameScene extends Phaser.Scene
 				this.ship.x = pointer.x;
 			}
 		});
+
+		
 		//handler for the shoot of the projectile
 		this.input.on('pointerdown', (pointer) => {
 			if(stopEffect===false){
@@ -259,6 +263,7 @@ class GameScene extends Phaser.Scene
 		});
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
+
 		//handler for the leaderboard update
 		socket.on('message', function(data){
 			var i = 1;
@@ -317,6 +322,40 @@ class GameScene extends Phaser.Scene
 	update(time) {
 		var currentLeftLimit = 100;
 		var currentRightLimit = 750;
+
+		if(cursors.right.isDown){
+			if(this.ship.x <= 705)
+			this.ship.x += 2.5;
+		}
+		if(cursors.left.isDown){
+			if(this.ship.x >= 80)
+			this.ship.x -= 2.5;
+		}
+		
+		if (cursors.up.isDown){
+			if(stopEffect===false){
+				var timerShot = timedEvent.getProgress().toString().substr(0, 5);
+				if(ammo>0){
+					if (timerShot - lastLaserTime >0.005){
+						lastLaserTime = timerShot;
+						ammo-=1;
+						ammoText.setText('Ammo : ' + ammo);
+						this.fireBullet();
+						this.bass.play();
+					}
+					else{
+						var shootDelay = this.sound.add('shootDelay');	
+						shootDelay.play();
+					}
+				}
+				if(ammo==0){
+					ammoText.setText('Ammo : ' + ammo+ '[press R to reload ]');
+					var outAmmoEffect = this.sound.add('outAmmo');	
+					outAmmoEffect.play();
+				}
+			}
+		}
+
 		//calulating the first column of aliens that are alive from the left
 		for(var i=0;i<10;i++){
 			var check = true;
@@ -492,7 +531,7 @@ class HomeScene extends Phaser.Scene {
 		image5=this.add.image(350,490,'buttom');
 		image6=this.add.image(350,390,'buttom');
 		image8=this.add.image(330,450,'backChat');
-		image7=this.add.sprite(510,550,'send').setInteractive();
+		image7=this.add.sprite(510,546,'send').setInteractive();
         var createRoom = this.add.dom(400, 600).createFromCache('login');
 		createRoom.addListener('click');
 	    var joinRoom = this.add.dom(400, 600).createFromCache('joinRoom');
