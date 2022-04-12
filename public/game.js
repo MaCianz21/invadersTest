@@ -325,12 +325,12 @@ class GameScene extends Phaser.Scene
 
 		if(cursors.right.isDown){
 			if(this.ship.x <= 705){
-				this.ship.x += 2.5;
+				this.ship.x += 3;
 			}
 		}
 		if(cursors.left.isDown){
 			if(this.ship.x >= 80){
-				this.ship.x -= 2.5;
+				this.ship.x -= 3;
 			}
 		}
 		
