@@ -234,8 +234,7 @@ class GameScene extends Phaser.Scene
 		//handler for the shoot of the projectile
 		this.input.on('pointerdown', (pointer) => {
 			if(stopEffect===false){
-					var time = timedEvent.getProgress().toString().substr(0, 5);
-				
+				var time = timedEvent.getProgress().toString().substr(0, 5);
 				if(ammo>0){
 					if (time - lastLaserTime >0.005){
 						lastLaserTime = time;
@@ -255,8 +254,6 @@ class GameScene extends Phaser.Scene
 					outAmmoEffect.play();
 				}
 			}
-			
-			
 		});
 
 		this.input.keyboard.on('keydown_R', this.reloadAmmo, this);
