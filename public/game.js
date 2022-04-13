@@ -95,7 +95,6 @@ class GameScene extends Phaser.Scene
 		this.laserGroup;
 		this.inputKeys;
 		this.bass;
-		
 	}
 
 	preload() {
@@ -121,6 +120,7 @@ class GameScene extends Phaser.Scene
 	}
 
 	create() {
+		this.ammoEffect = this.sound.add('ammo');	
 		cursors = this.input.keyboard.createCursorKeys();
 		load.stop();
 		lobby.stop();
@@ -206,15 +206,15 @@ class GameScene extends Phaser.Scene
 	}
 	reloadAmmo(event){
 		if(stopEffect===false){
-			var ammoEffect = this.sound.add('ammo');	
-			ammoEffect.play();
-			if(score >2 ){
+			if(score>2){
 				if(ammo<3){
+					this.ammoEffect.play();
 					score = score-2;
 				    scoreText.setText('Score: ' + score);
 				}
 			}
 			else{
+				this.ammoEffect.play();
 				score = 0;
 				scoreText.setText('Score: ' + score);
 			}
