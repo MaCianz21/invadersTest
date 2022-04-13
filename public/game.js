@@ -310,6 +310,7 @@ class GameScene extends Phaser.Scene
 			pointText.setText(Leaderboard);
 		});
 	}
+	
 	fireBullet() {
 		this.laserGroup.fireBullet(this.ship.x, this.ship.y - 20);
 	}
