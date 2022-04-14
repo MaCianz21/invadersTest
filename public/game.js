@@ -10,6 +10,7 @@ var ammo = 3;
 var cursors;
 var ammoText;
 var timeText;
+var shot;
 var timedEvent;
 var lastLaserTime = 0;
 var Leaderboard;
@@ -57,6 +58,7 @@ var rightLimit = 750;
 var movementX=0.5;
 var speedUpAlienI;
 var speedUpAlienH;
+var outAmmoEffect;
 
 //handler for the collision between alien and projectiles(user)
 function removeAlien(alien,laser){
@@ -94,7 +96,6 @@ class GameScene extends Phaser.Scene
 		this.alienGroup;
 		this.laserGroup;
 		this.inputKeys;
-		this.bass;
 	}
 
 	preload() {
@@ -121,10 +122,11 @@ class GameScene extends Phaser.Scene
 
 	create() {
 		this.ammoEffect = this.sound.add('ammo');	
+		outAmmoEffect = this.sound.add('outAmmo');	
 		cursors = this.input.keyboard.createCursorKeys();
 		load.stop();
 		lobby.stop();
-		this.bass = this.sound.add('bass');
+		shot = this.sound.add('bass');
 	    startGame = this.sound.add('startGame');
 		startGame.play();
 		timedEvent = this.time.delayedCall(100000);
@@ -198,12 +200,14 @@ class GameScene extends Phaser.Scene
 			children[i].setPosition(x, y);
    		}
 	}
+
 	addShip() {
 		const centerX = this.cameras.main.width / 2;
 		const bottom = this.cameras.main.height;
 		this.ship = this.physics.add.sprite(centerX, bottom - 90, 'ship');
 		this.ship.setCollideWorldBounds(true);
 	}
+	
 	reloadAmmo(event){
 		if(stopEffect===false){
 			if(score>2){
@@ -241,7 +245,7 @@ class GameScene extends Phaser.Scene
 						ammo-=1;
 						ammoText.setText('Ammo : ' + ammo);
 						this.fireBullet();
-						this.bass.play();
+					    shot.play();
 					}
 					else{
 						var shootDelay = this.sound.add('shootDelay');	
@@ -324,6 +328,7 @@ class GameScene extends Phaser.Scene
 				this.ship.x += 3;
 			}
 		}
+
 		if(cursors.left.isDown){
 			if(this.ship.x >= 80){
 				this.ship.x -= 3;
@@ -333,6 +338,7 @@ class GameScene extends Phaser.Scene
 		if(cursors.down.isDown){
 			this.reloadAmmo();
 		}
+
 		if (cursors.up.isDown){
 			if(stopEffect===false){
 				var timerShot = timedEvent.getProgress().toString().substr(0, 5);
@@ -342,18 +348,15 @@ class GameScene extends Phaser.Scene
 						ammo-=1;
 						ammoText.setText('Ammo : ' + ammo);
 						this.fireBullet();
-						this.bass.play();
-					}
-					else{
-						var shootDelay = this.sound.add('shootDelay');	
-						shootDelay.play();
+						shot.play();
 					}
 				}
+				
 				if(ammo==0){
 					ammoText.setText('Ammo : ' + ammo+ '[reload mandatory!]');
-					var outAmmoEffect = this.sound.add('outAmmo');	
 					outAmmoEffect.play();
 				}
+				
 			}
 		}
 
@@ -519,6 +522,7 @@ class HomeScene extends Phaser.Scene {
 		modalTextRoom.setDepth(1);
 		modalTextNickname.setDepth(1);
         lobby = this.sound.add('lobby');
+		lobby.loop=true;
 		lobby.play();	
 		var description = this.add.dom(320, 410).createFromCache('description');
 		this.add.image(550,350,'background');
