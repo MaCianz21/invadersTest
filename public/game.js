@@ -812,6 +812,7 @@ class LoadScene extends Phaser.Scene {
     create (){	
 		load = this.sound.add('load');
 		lobby.stop();
+		load.loop=true;
 		load.play();	
 		this.add.image(400,350,'back');
 		loadText = this.add.text(16, 16, 'Wait for the other players. Remaining player: '+nPlayer, { fontSize: '30px', fill: '#FFFF' });
