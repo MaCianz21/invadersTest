@@ -6,7 +6,7 @@
     "express": "^4.17.3",
     "git": "^0.1.5",
     "git-all": "^0.0.3",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.6.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
